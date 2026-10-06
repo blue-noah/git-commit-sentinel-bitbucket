@@ -1,0 +1,41 @@
+# Bitbucket Data Center for end-to-end tests: Atlassian's official image, which ships its own JDK and a git
+# version supported by that Bitbucket release. Started by run.sh (`podman kube play`), which fills in
+# BITBUCKET_VERSION; setup is unattended, with the license from timebomb-license.yaml.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: commit-sentinel-e2e
+spec:
+  restartPolicy: Never
+  containers:
+    - name: bitbucket
+      image: docker.io/atlassian/bitbucket:${BITBUCKET_VERSION}
+      ports:
+        - containerPort: 7990
+          hostPort: 7990
+      env:
+        - name: JVM_MAXIMUM_MEMORY
+          value: 1g
+        # The image also starts a bundled OpenSearch (another JVM) for code search, which the tests don't need.
+        - name: SEARCH_ENABLED
+          value: "false"
+        # Installing apps by upload is off by default in recent Bitbucket releases; run.sh installs the plugin that way.
+        - name: JVM_SUPPORT_RECOMMENDED_ARGS
+          value: -Dupm.plugin.upload.enabled=true
+        - name: SETUP_DISPLAYNAME
+          value: Commit Sentinel e2e
+        - name: SETUP_BASEURL
+          value: http://localhost:7990
+        - name: SETUP_SYSADMIN_USERNAME
+          value: admin
+        - name: SETUP_SYSADMIN_PASSWORD
+          value: admin
+        - name: SETUP_SYSADMIN_DISPLAYNAME
+          value: Admin
+        - name: SETUP_SYSADMIN_EMAILADDRESS
+          value: admin@example.com
+        - name: SETUP_LICENSE
+          valueFrom:
+            configMapKeyRef:
+              name: bitbucket-license
+              key: license

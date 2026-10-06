@@ -1,0 +1,52 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Derive version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Set the project version
+        run: >
+          mvn -B -ntp org.codehaus.mojo:versions-maven-plugin:2.22.0:set
+          -DnewVersion=${{ steps.version.outputs.version }} -DgenerateBackupPoms=false
+
+      - name: Build, format check, test and coverage check
+        run: mvn -B verify
+
+      - name: Mutation testing
+        run: mvn -B org.pitest:pitest-maven:mutationCoverage
+
+      - name: Checksum
+        working-directory: target
+        run: sha256sum "git-commit-sentinel-bitbucket-${{ steps.version.outputs.version }}.jar" > SHA256SUMS.txt
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            "target/git-commit-sentinel-bitbucket-${{ steps.version.outputs.version }}.jar" \
+            target/SHA256SUMS.txt

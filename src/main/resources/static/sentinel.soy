@@ -1,0 +1,117 @@
+{namespace com.github.bluenoah.commitsentinel}
+
+/**
+ * Hook settings form (Project or Repository settings → Hooks → Git Commit Sentinel).
+ * Field names match SettingsKeys.java and the rule names match RuleSet.standard() (SoyFormTest checks both).
+ * @param config
+ * @param? errors
+ */
+{template .hookForm}
+    <p>Blank fields and <em>default</em> levels use the built-in defaults, the same as git-commit-sentinel's.</p>
+    {call .text}
+        {param name: 'branchPattern' /}
+        {param label: 'Feature branch regex' /}
+        {param description: 'Java regular expression matched against the whole branch name, without refs/heads/. Default: feature/.+' /}
+        {param config: $config /}
+        {param errors: $errors /}
+    {/call}
+    {call .text}
+        {param name: 'types' /}
+        {param label: 'Allowed types' /}
+        {param description: 'Comma-separated. Default: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert' /}
+        {param config: $config /}
+        {param errors: $errors /}
+    {/call}
+    {call .text}
+        {param name: 'headerMaxLength' /}
+        {param label: 'Header max length' /}
+        {param description: 'Characters. Default: 100' /}
+        {param config: $config /}
+        {param errors: $errors /}
+    {/call}
+
+    <fieldset>
+        <legend><span>Rule levels</span></legend>
+        {call .level}{param rule: 'format' /}{param description: 'header matches <type>(<scope>)!: <description> (default: error)' /}{param config: $config /}{param errors: $errors /}{/call}
+        {call .level}{param rule: 'type' /}{param description: 'type is one of the allowed types (default: error)' /}{param config: $config /}{param errors: $errors /}{/call}
+        {call .level}{param rule: 'description-empty' /}{param description: 'description is not empty (default: error)' /}{param config: $config /}{param errors: $errors /}{/call}
+        {call .level}{param rule: 'description-period' /}{param description: 'description does not end with a period (default: warn)' /}{param config: $config /}{param errors: $errors /}{/call}
+        {call .level}{param rule: 'header-length' /}{param description: 'header within the max length (default: warn)' /}{param config: $config /}{param errors: $errors /}{/call}
+        {call .level}{param rule: 'body-blank-line' /}{param description: 'blank line between header and body (default: warn)' /}{param config: $config /}{param errors: $errors /}{/call}
+    </fieldset>
+
+    {call .textarea}
+        {param name: 'bypassUsers' /}
+        {param label: 'Bypass users' /}
+        {param description: 'Usernames never checked, one per line (e.g. CI or release accounts).' /}
+        {param config: $config /}
+        {param errors: $errors /}
+    {/call}
+{/template}
+
+/**
+ * @param name
+ * @param label
+ * @param description
+ * @param config
+ * @param? errors
+ */
+{template .text private="true"}
+    <div class="field-group">
+        <label for="{$name}">{$label}</label>
+        <input class="text long-field" type="text" id="{$name}" name="{$name}" value="{$config[$name] ?: ''}">
+        <div class="description">{$description}</div>
+        {call .error}{param name: $name /}{param errors: $errors /}{/call}
+    </div>
+{/template}
+
+/**
+ * @param name
+ * @param label
+ * @param description
+ * @param config
+ * @param? errors
+ */
+{template .textarea private="true"}
+    <div class="field-group">
+        <label for="{$name}">{$label}</label>
+        <textarea class="textarea long-field" rows="4" id="{$name}" name="{$name}">{$config[$name] ?: ''}</textarea>
+        <div class="description">{$description}</div>
+        {call .error}{param name: $name /}{param errors: $errors /}{/call}
+    </div>
+{/template}
+
+/**
+ * @param rule
+ * @param description
+ * @param config
+ * @param? errors
+ */
+{template .level private="true"}
+    {let $name: 'rule-' + $rule /}
+    {let $value: $config[$name] ?: 'default' /}
+    <div class="field-group">
+        <label for="{$name}">{$rule}</label>
+        <select class="select" id="{$name}" name="{$name}">
+            <option value="default" {if $value == 'default'}selected{/if}>default</option>
+            <option value="off" {if $value == 'off'}selected{/if}>off</option>
+            <option value="warn" {if $value == 'warn'}selected{/if}>warn</option>
+            <option value="error" {if $value == 'error'}selected{/if}>error</option>
+        </select>
+        <div class="description">{$description}</div>
+        {call .error}{param name: $name /}{param errors: $errors /}{/call}
+    </div>
+{/template}
+
+/**
+ * Bitbucket passes form errors as field name → list of messages.
+ * @param name
+ * @param? errors
+ */
+{template .error private="true"}
+    {if $errors and $errors[$name]}
+        {foreach $e in $errors[$name]}
+            <div class="error">{$e}</div>
+        {/foreach}
+    {/if}
+{/template}

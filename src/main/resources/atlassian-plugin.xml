@@ -1,0 +1,24 @@
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+        <param name="atlassian-data-center-status">compatible</param>
+        <param name="atlassian-data-center-compatible">true</param>
+    </plugin-info>
+
+    <!-- Enabled per project (inherited by its repositories) or per repository, from Settings → Hooks or REST. -->
+    <repository-hook key="commit-sentinel-hook" name="Git Commit Sentinel"
+                     class="com.github.bluenoah.commitsentinel.hook.SentinelHook">
+        <description>Checks that commits pushed to feature branches follow Conventional Commits.</description>
+        <scopes>
+            <scope>project</scope>
+            <scope>repository</scope>
+        </scopes>
+        <validator>com.github.bluenoah.commitsentinel.hook.SentinelHook</validator>
+        <config-form name="Git Commit Sentinel" key="commit-sentinel-hook-config">
+            <view>com.github.bluenoah.commitsentinel.hookForm</view>
+            <directory location="/static/"/>
+        </config-form>
+    </repository-hook>
+</atlassian-plugin>

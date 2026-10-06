@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build, format check (Spotless), test and coverage check (JaCoCo, 100%)
+        run: mvn -B verify
+
+      - name: Mutation testing (PIT, 100% mutation score)
+        run: mvn -B org.pitest:pitest-maven:mutationCoverage
+
+      - name: Upload coverage and mutation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: quality-reports
+          path: |
+            target/site/jacoco/
+            target/pit-reports/
+          if-no-files-found: ignore
+
+      - name: Upload plugin jar
+        uses: actions/upload-artifact@v7
+        with:
+          name: plugin-jar
+          path: target/git-commit-sentinel-bitbucket-*.jar
+          if-no-files-found: error
+
+  e2e:
+    # A real Bitbucket per version, in a pod (e2e/run.sh): the production version and the latest 9.4 patch.
+    runs-on: ubuntu-24.04 # pinned: it ships Podman, and ubuntu-latest moves to 26.04 in November 2026
+    strategy:
+      fail-fast: false
+      matrix:
+        bitbucket: ["9.4.13", "9.4.26"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build the plugin
+        run: mvn -B package -DskipTests
+
+      - name: End-to-end tests on Bitbucket ${{ matrix.bitbucket }}
+        run: e2e/run.sh
+        env:
+          BITBUCKET_VERSION: ${{ matrix.bitbucket }}
