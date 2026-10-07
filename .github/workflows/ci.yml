@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v6
@@ -19,8 +21,12 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Build, format check (Spotless), tests, coverage (JaCoCo, 100%) and mutation testing (PIT, 100%)
-        run: mvn -B verify org.pitest:pitest-maven:mutationCoverage
+      - name: Build, format check (Spotless), tests, coverage (JaCoCo, 100%), mutation testing (PIT, 100%) and SonarQube Cloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          mvn -B verify org.pitest:pitest-maven:mutationCoverage
+          ${SONAR_TOKEN:+org.sonarsource.scanner.maven:sonar-maven-plugin:sonar}
 
       - name: Upload coverage and mutation reports
         if: always()

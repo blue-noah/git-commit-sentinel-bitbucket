@@ -43,6 +43,10 @@
         <pitest.junit5.version>1.2.3</pitest.junit5.version>
         <spotless.version>3.10.3</spotless.version>
         <palantir.java.format.version>2.102.0</palantir.java.format.version>
+        <sonar.maven.plugin.version>5.8.0.7211</sonar.maven.plugin.version>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>blue-noah</sonar.organization>
+        <sonar.projectKey>blue-noah_git-commit-sentinel-bitbucket</sonar.projectKey>
     </properties>
 
     <dependencyManagement>
@@ -147,6 +151,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${sonar.maven.plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
