@@ -7,17 +7,16 @@
         <param name="atlassian-data-center-compatible">true</param>
     </plugin-info>
 
-    <!-- Enabled per project (inherited by its repositories) or per repository, from Settings → Hooks or REST. -->
     <repository-hook key="git-commit-sentinel-bitbucket-hook" name="Git Commit Sentinel for Bitbucket"
-                     class="com.github.bluenoah.gitcommitsentinel.bitbucket.hook.SentinelHook">
+                     class="com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.SentinelHook">
         <description>Checks that commits pushed to feature branches follow Conventional Commits.</description>
         <scopes>
             <scope>project</scope>
             <scope>repository</scope>
         </scopes>
-        <validator>com.github.bluenoah.gitcommitsentinel.bitbucket.hook.SentinelHook</validator>
+        <validator>com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.SentinelHook</validator>
         <config-form name="Git Commit Sentinel for Bitbucket" key="git-commit-sentinel-bitbucket-hook-config">
-            <view>com.github.bluenoah.gitcommitsentinel.bitbucket.hookForm</view>
+            <view>com.github.bluenoah.gitcommitsentinel.bitbucket.adapterForm</view>
             <directory location="/static/"/>
         </config-form>
     </repository-hook>

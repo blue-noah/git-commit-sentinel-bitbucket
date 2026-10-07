@@ -157,9 +157,12 @@ publishes a GitHub release with the jar and its SHA-256.
 ## Design
 
 - [docs/adr](docs/adr) — why it's built this way.
-- `rules/` — the rules, plain Java, no Bitbucket dependency.
-- `config/` — reading and validating the hook settings.
-- `hook/` — the repository hook and the push check.
+Hexagonal architecture ([ADR 0007](docs/adr/0007-hexagonal-architecture.md)), dependencies pointing inwards only:
+
+- `domain/` — the rules, plain Java.
+- `application/` — the push check use case, and the `PushReport` port it tells the developer through.
+- `adapter/inbound/` — where Bitbucket calls in: the repository hook, the stream of pushed commits, the hook settings.
+- `adapter/outbound/` — where the application calls out: the pusher's terminal, implementing `PushReport`.
 
 No bundled libraries: only APIs Bitbucket provides.
 
