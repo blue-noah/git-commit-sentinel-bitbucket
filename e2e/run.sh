@@ -22,7 +22,7 @@ down() { podman kube down "$POD" >/dev/null 2>&1 || true; }
 # On failure, show Bitbucket's log before the pod (and its log) goes away.
 finish() {
     local rc=$?
-    [ "$rc" -eq 0 ] || podman logs --tail 100 commit-sentinel-e2e-bitbucket 2>&1 || true
+    [ "$rc" -eq 0 ] || podman logs --tail 100 git-commit-sentinel-bitbucket-e2e-bitbucket 2>&1 || true
     [ -n "${KEEP:-}" ] || down
     return "$rc"
 }
@@ -34,11 +34,11 @@ podman kube play --configmap e2e/timebomb-license.yaml "$POD" >/dev/null
 for _ in $(seq 1 120); do
     status=$(curl -s "$BB_URL/status" || true)
     [[ $status == *RUNNING* ]] && break
-    if [[ $status == *ERROR* ]]; then podman logs --tail 50 commit-sentinel-e2e-bitbucket; exit 1; fi
+    if [[ $status == *ERROR* ]]; then podman logs --tail 50 git-commit-sentinel-bitbucket-e2e-bitbucket; exit 1; fi
     sleep 5
 done
 [[ $status == *RUNNING* ]] || { echo "Bitbucket did not start: $status" >&2; exit 1; }
-echo "git on the server: $(podman exec commit-sentinel-e2e-bitbucket git --version)"
+echo "git on the server: $(podman exec git-commit-sentinel-bitbucket-e2e-bitbucket git --version)"
 
 echo "== installing $JAR"
 token=$(curl -s -u admin:admin -D - -o /dev/null "$BB_URL/rest/plugins/1.0/?os_authType=basic" \

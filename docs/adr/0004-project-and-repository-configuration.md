@@ -17,7 +17,7 @@ orchestrator does with one REST call per project.
 
 ## Decision
 
-One configurable repository hook, `commit-sentinel-hook`, with project and
+One configurable repository hook, `git-commit-sentinel-bitbucket-hook`, with project and
 repository scope — nothing else:
 
 - **Project**: enabling it (with or without settings) covers every repository
