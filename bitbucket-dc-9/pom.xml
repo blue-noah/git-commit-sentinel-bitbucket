@@ -10,17 +10,17 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>git-commit-sentinel-bitbucket</artifactId>
+    <artifactId>git-commit-sentinel-bitbucket-dc-9</artifactId>
     <packaging>atlassian-plugin</packaging>
 
     <name>Git Commit Sentinel for Bitbucket</name>
-    <description>Rejects or warns about pushes to feature branches whose commit messages are not Conventional Commits.</description>
+    <description>For Bitbucket Data Center 9. Rejects or warns about pushes to feature branches whose commit messages are not Conventional Commits.</description>
 
     <properties>
         <bitbucket.version>9.4.13</bitbucket.version>
         <amps.version>9.0.6</amps.version>
         <spring.scanner.version>5.1.0</spring.scanner.version>
-        <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
+        <atlassian.plugin.key>com.github.bluenoah.git-commit-sentinel-bitbucket</atlassian.plugin.key>
     </properties>
 
     <repositories>
