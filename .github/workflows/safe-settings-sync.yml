@@ -8,6 +8,9 @@ on:
     - cron: "0 6 * * *"
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+
 jobs:
   safeSettingsSync:
     runs-on: ubuntu-latest
@@ -22,15 +25,15 @@ jobs:
       SAFE_SETTINGS_CODE_DIR: ${{ github.workspace }}/.safe-settings-code
     steps:
       # Self-checkout: this repo is its own "admin repo", holding its own .github/repos/*.yml config.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: github-community-projects/safe-settings
           ref: ${{ env.SAFE_SETTINGS_COMMIT }}
           path: ${{ env.SAFE_SETTINGS_CODE_DIR }}
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           package-manager-cache: false
 
