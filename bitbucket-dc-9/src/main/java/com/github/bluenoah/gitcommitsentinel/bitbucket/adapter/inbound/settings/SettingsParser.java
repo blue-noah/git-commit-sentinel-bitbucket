@@ -19,6 +19,12 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Turns the hook settings Bitbucket stores, as saved from the settings form or through REST, into the
+ * {@link PushPolicy} the push check applies. A blank setting takes its default; an invalid one is reported, with the
+ * value as typed, and takes its default too, so a push is always checked. Its keys are a public contract: the form's
+ * field names and the REST API's JSON keys.
+ */
 public record SettingsParser(
         RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<String, String> reportInvalidSetting) {
 
