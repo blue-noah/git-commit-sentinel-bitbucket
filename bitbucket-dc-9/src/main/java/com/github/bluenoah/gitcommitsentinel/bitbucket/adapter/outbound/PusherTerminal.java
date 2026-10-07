@@ -10,6 +10,11 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 
+/**
+ * The {@link PushReport} that writes to the terminal of the developer who is pushing: git shows each line with a
+ * {@code remote:} prefix. Every line goes through {@link ControlCharacters} and is flushed at once, so it is shown
+ * while the push is still being checked. A push without a terminal behind it gets one that writes nowhere.
+ */
 public final class PusherTerminal implements PushReport {
 
     private static final String LINE_PREFIX = "git-commit-sentinel-bitbucket: ";
