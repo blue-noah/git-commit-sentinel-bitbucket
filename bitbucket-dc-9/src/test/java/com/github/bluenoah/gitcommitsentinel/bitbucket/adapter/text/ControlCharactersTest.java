@@ -14,6 +14,15 @@ class ControlCharactersTest {
 
     private final ControlCharacters sut = new ControlCharacters();
 
+    @Test
+    void nullIsShownAsNothing() {
+        // when
+        var shown = sut.neutralized(null);
+
+        // then
+        then(shown).isEmpty();
+    }
+
     static Stream<Arguments> attacks() {
         return Stream.of(
                 Arguments.of("clear screen: \u001b[2J", "clear screen: \\u{1b}[2J"),
