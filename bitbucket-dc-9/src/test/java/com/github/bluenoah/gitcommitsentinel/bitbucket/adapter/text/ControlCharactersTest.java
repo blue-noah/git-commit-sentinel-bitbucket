@@ -34,7 +34,7 @@ class ControlCharactersTest {
                         "nul \u0000 del \u007f bell \u0007 tab \t", "nul \\u{0} del \\u{7f} bell \\u{7} tab \\u{9}"),
                 Arguments.of("bidi \u202Egnp.exe", "bidi \\u{202e}gnp.exe"),
                 Arguments.of("zero\u200Bwidth", "zero\\u{200b}width"),
-                Arguments.of("hidden" + Character.toString(0xE0041), "hidden\\u{e0041}"),
+                Arguments.of("hidden%s".formatted(Character.toString(0xE0041)), "hidden\\u{e0041}"),
                 Arguments.of("line\u2028separator", "line\\u{2028}separator"));
     }
 
