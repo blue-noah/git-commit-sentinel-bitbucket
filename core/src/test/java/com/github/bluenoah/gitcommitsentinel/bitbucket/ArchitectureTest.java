@@ -1,55 +1,43 @@
 package com.github.bluenoah.gitcommitsentinel.bitbucket;
 
-import static org.assertj.core.api.BDDAssertions.then;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Stream;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
+import org.junit.jupiter.api.Test;
 
 class ArchitectureTest {
 
-    private static final Path MAIN_SOURCES = Path.of("src/main/java/com/github/bluenoah/gitcommitsentinel/bitbucket");
-    private static final String PROJECT_PACKAGE = "com.github.bluenoah.gitcommitsentinel.bitbucket";
+    private final JavaClasses productionClasses = new ClassFileImporter()
+            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+            .importPackages("com.github.bluenoah.gitcommitsentinel.bitbucket");
 
-    @ParameterizedTest(name = "{0} imports only {1}")
-    @CsvSource({"domain, java.", "application, java. domain."})
-    void eachLayerImportsOnlyTheLayersInsideIt(String layer, String allowedImportPrefixes) {
+    @Test
+    void theDomainDependsOnTheJdkOnly() {
         // given
-        var allowed = Stream.of(allowedImportPrefixes.split(" "))
-                .map(prefix -> prefix.startsWith("java.") ? prefix : "%s.%s".formatted(PROJECT_PACKAGE, prefix))
-                .toList();
+        var rule = classes()
+                .that()
+                .resideInAPackage("..domain..")
+                .should()
+                .onlyDependOnClassesThat()
+                .resideInAnyPackage("java..", "..domain..");
 
-        // when
-        var forbiddenImports = importsOf(MAIN_SOURCES.resolve(layer)).stream()
-                .filter(imported -> allowed.stream().noneMatch(imported::startsWith))
-                .toList();
-
-        // then
-        then(importsOf(MAIN_SOURCES.resolve(layer))).isNotEmpty();
-        then(forbiddenImports).isEmpty();
+        // when / then
+        rule.check(productionClasses);
     }
 
-    private List<String> importsOf(Path layerSources) {
-        try (Stream<Path> files = Files.list(layerSources)) {
-            return files.flatMap(this::lines)
-                    .filter(line -> line.startsWith("import "))
-                    .map(line -> line.replaceFirst("^import (static )?", ""))
-                    .toList();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
+    @Test
+    void theApplicationDependsOnTheJdkAndTheDomainOnly() {
+        // given
+        var rule = classes()
+                .that()
+                .resideInAPackage("..application..")
+                .should()
+                .onlyDependOnClassesThat()
+                .resideInAnyPackage("java..", "..domain..", "..application..");
 
-    private Stream<String> lines(Path file) {
-        try {
-            return Files.readAllLines(file).stream();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        // when / then
+        rule.check(productionClasses);
     }
 }
