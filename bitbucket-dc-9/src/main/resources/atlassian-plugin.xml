@@ -16,7 +16,7 @@
         </scopes>
         <validator>com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.ConventionalCommitsHook</validator>
         <config-form name="Git Commit Sentinel for Bitbucket" key="git-commit-sentinel-bitbucket-hook-config">
-            <view>com.github.bluenoah.gitcommitsentinel.bitbucket.adapterForm</view>
+            <view>com.github.bluenoah.gitcommitsentinel.bitbucket.hookForm</view>
             <directory location="/static/"/>
         </config-form>
     </repository-hook>
