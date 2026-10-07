@@ -6,6 +6,7 @@ import com.atlassian.bitbucket.hook.repository.RepositoryHookResult;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound.PusherTerminal;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushedCommit;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushedCommitsCheck;
+import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ final class PushedCommitsListener implements PreRepositoryHookCommitCallback {
     }
 
     @Override
-    public boolean onCommitAdded(CommitAddedDetails added) {
+    public boolean onCommitAdded(@Nonnull CommitAddedDetails added) {
         try {
             pushedCommitsCheck.check(pushedCommit(added));
             return KEEP_STREAMING;
@@ -43,6 +44,7 @@ final class PushedCommitsListener implements PreRepositoryHookCommitCallback {
         }
     }
 
+    @Nonnull
     @Override
     public RepositoryHookResult getResult() {
         if (checkingFailed) {

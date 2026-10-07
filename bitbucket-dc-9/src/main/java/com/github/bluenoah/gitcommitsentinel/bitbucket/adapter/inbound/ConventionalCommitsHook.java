@@ -25,6 +25,7 @@ import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +52,10 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
         this.authenticationContext = authenticationContext;
     }
 
+    @Nonnull
     @Override
-    public RepositoryHookResult preUpdate(PreRepositoryHookContext context, RepositoryPushHookRequest push) {
+    public RepositoryHookResult preUpdate(
+            @Nonnull PreRepositoryHookContext context, @Nonnull RepositoryPushHookRequest push) {
         var pusherTerminal = PusherTerminal.of(push);
         try {
             if (isGitPush(push)) {
@@ -70,7 +73,7 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
     }
 
     @Override
-    public void validate(Settings settings, SettingsValidationErrors errors, Scope scope) {
+    public void validate(@Nonnull Settings settings, @Nonnull SettingsValidationErrors errors, @Nonnull Scope scope) {
         new SettingsParser(ruleSet, settings.asMap(), neutralizingProblems(errors::addFieldError)).pushPolicy();
     }
 
