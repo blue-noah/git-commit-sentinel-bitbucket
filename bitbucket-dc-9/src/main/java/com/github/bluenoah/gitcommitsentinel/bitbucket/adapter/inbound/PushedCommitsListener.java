@@ -9,6 +9,11 @@ import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushedCommits
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Lives for a single push: Bitbucket streams it the commits the push adds, one at a time, then asks for the result. It
+ * hands each commit to {@link PushedCommitsCheck} and turns its verdict into accepting or rejecting the push; an
+ * internal failure accepts it.
+ */
 final class PushedCommitsListener implements PreRepositoryHookCommitCallback {
 
     private static final Logger log = LoggerFactory.getLogger(PushedCommitsListener.class);
