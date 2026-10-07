@@ -23,6 +23,7 @@ client hook gives feedback at commit time; this plugin enforces on push.
 - **Docs site**: https://blue-noah.github.io/git-commit-sentinel-bitbucket/ — the essentials, as a short static page.
 - **Design decisions**: [docs/adr](docs/adr).
 - **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md) — code and test conventions.
+- **Security**: [SECURITY.md](SECURITY.md) — how to report a vulnerability privately.
 
 ## What it does
 
