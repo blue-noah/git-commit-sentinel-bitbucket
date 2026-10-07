@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 class ArchitectureTest {
 
     private final JavaClasses productionClasses = new ClassFileImporter()
+            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
             .importPackages("com.github.bluenoah.gitcommitsentinel.bitbucket");
 

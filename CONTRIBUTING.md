@@ -5,6 +5,15 @@ commits, and three checks green (`test`, `e2e (9.4.13)`, `e2e (9.4.26)`).
 How to build and test: [README](README.md#build--test). Why things are built
 the way they are: [docs/adr](docs/adr).
 
+## Enforced by the build
+
+Some of the rules below fail the build when broken: `CodingRules`, checked by
+each module's `CodingRulesTest` with ArchUnit, covers static methods (factories
+only), static fields (final), injection (constructors only), mutable fields
+(only in the objects of a single push), BDDMockito and AssertJ BDD only, and
+classpath files injected in tests; `ArchitectureTest` covers the layers;
+Spotless the formatting; JaCoCo and PIT the gates. The others rely on review.
+
 ## Commits
 
 [Conventional Commits](https://www.conventionalcommits.org/), as the plugin
