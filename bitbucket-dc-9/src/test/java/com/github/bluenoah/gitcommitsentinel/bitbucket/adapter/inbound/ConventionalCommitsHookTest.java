@@ -31,6 +31,10 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -210,6 +214,47 @@ class ConventionalCommitsHookTest {
         // then
         then(result).matches(RepositoryHookResult::isAccepted, "accepted");
         then(terminalOutput.toString()).contains("internal error");
+    }
+
+    @Test
+    void concurrentPushesShareTheHookWithoutInterfering() throws InterruptedException {
+        // given
+        var messages = IntStream.range(0, 400)
+                .mapToObj(i -> i % 2 == 0 ? "feat: valid %s".formatted(i) : "wip: invalid %s".formatted(i))
+                .toList();
+        var executor = Executors.newFixedThreadPool(16);
+
+        // when
+        List<Future<Boolean>> rejections;
+        try {
+            rejections = executor.invokeAll(messages.stream()
+                    .<Callable<Boolean>>map(message -> () -> isRejectedAlone(message))
+                    .toList());
+        } finally {
+            executor.shutdown();
+        }
+
+        // then
+        then(rejections)
+                .extracting(Future::get)
+                .containsExactlyElementsOf(messages.stream()
+                        .map(message -> message.startsWith("wip"))
+                        .toList());
+    }
+
+    private boolean isRejectedAlone(String message) {
+        var ownContext = mock(PreRepositoryHookContext.class);
+        var defaultSettings = settings(Map.of());
+        given(ownContext.getSettings()).willReturn(defaultSettings);
+        var featureBranchUpdate = branch("feature/x", RefChangeType.UPDATE);
+        var ownPush = pushWithTerminal(new StringWriter());
+        given(ownPush.getTrigger()).willReturn(StandardRepositoryHookTrigger.REPO_PUSH);
+        given(ownPush.getRefChanges()).willReturn(List.of(featureBranchUpdate));
+        sut.preUpdate(ownContext, ownPush);
+        var callback = ArgumentCaptor.forClass(PreRepositoryHookCommitCallback.class);
+        BDDMockito.then(ownContext).should().registerCommitCallback(callback.capture(), any());
+        callback.getValue().onCommitAdded(commit("refs/heads/feature/x", message, 1));
+        return callback.getValue().getResult().isRejected();
     }
 
     @Test

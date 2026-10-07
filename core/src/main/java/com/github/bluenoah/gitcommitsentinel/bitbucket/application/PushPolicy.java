@@ -8,6 +8,10 @@ public record PushPolicy(Pattern featureBranchPattern, RuleConfig ruleConfig, Se
 
     public static final Pattern DEFAULT_FEATURE_BRANCH_PATTERN = Pattern.compile("feature/.+");
 
+    public PushPolicy {
+        bypassUsernames = Set.copyOf(bypassUsernames);
+    }
+
     boolean isFeatureBranch(String branchName) {
         return featureBranchPattern.matcher(branchName).matches();
     }
