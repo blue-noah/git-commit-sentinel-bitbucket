@@ -11,4 +11,7 @@
     <bean class="com.github.bluenoah.gitcommitsentinel.bitbucket.application.CheckPush">
         <constructor-arg ref="ruleSet"/>
     </bean>
+    <bean class="com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.settings.SettingsParser">
+        <constructor-arg ref="ruleSet"/>
+    </bean>
 </beans>

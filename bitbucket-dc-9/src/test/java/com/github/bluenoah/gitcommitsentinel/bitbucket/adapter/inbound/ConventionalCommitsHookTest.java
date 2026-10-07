@@ -25,6 +25,7 @@ import com.atlassian.bitbucket.scope.Scope;
 import com.atlassian.bitbucket.setting.Settings;
 import com.atlassian.bitbucket.setting.SettingsValidationErrors;
 import com.atlassian.bitbucket.user.ApplicationUser;
+import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.settings.SettingsParser;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.CheckPush;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleSet;
 import java.io.StringWriter;
@@ -42,13 +43,15 @@ import org.mockito.BDDMockito;
 
 class ConventionalCommitsHookTest {
 
+    private static final RuleSet RULE_SET = RuleSet.standard();
+
     private final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
     private final PreRepositoryHookContext context = mock(PreRepositoryHookContext.class);
     private final SettingsValidationErrors formErrors = mock(SettingsValidationErrors.class);
     private final StringWriter terminalOutput = new StringWriter();
 
     private final ConventionalCommitsHook sut =
-            new ConventionalCommitsHook(new CheckPush(RuleSet.standard()), RuleSet.standard(), authenticationContext);
+            new ConventionalCommitsHook(new CheckPush(RULE_SET), new SettingsParser(RULE_SET), authenticationContext);
 
     @BeforeEach
     void aliceIsPushingWithDefaultSettings() {

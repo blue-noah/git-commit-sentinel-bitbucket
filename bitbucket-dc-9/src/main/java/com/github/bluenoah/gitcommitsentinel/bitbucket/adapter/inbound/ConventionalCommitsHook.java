@@ -22,7 +22,6 @@ import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.text.ControlChara
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.CheckPush;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushPolicy;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushedRef;
-import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -41,15 +40,17 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
     private static final Logger log = LoggerFactory.getLogger(ConventionalCommitsHook.class);
 
     private final CheckPush checkPush;
-    private final RuleSet ruleSet;
+    private final SettingsParser settingsParser;
     private final AuthenticationContext authenticationContext;
     private final ControlCharacters controlCharacters = new ControlCharacters();
 
     @Inject
     public ConventionalCommitsHook(
-            CheckPush checkPush, RuleSet ruleSet, @ComponentImport AuthenticationContext authenticationContext) {
+            CheckPush checkPush,
+            SettingsParser settingsParser,
+            @ComponentImport AuthenticationContext authenticationContext) {
         this.checkPush = checkPush;
-        this.ruleSet = ruleSet;
+        this.settingsParser = settingsParser;
         this.authenticationContext = authenticationContext;
     }
 
@@ -75,7 +76,7 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
 
     @Override
     public void validate(@Nonnull Settings settings, @Nonnull SettingsValidationErrors errors, @Nonnull Scope scope) {
-        new SettingsParser(ruleSet, settings.asMap(), neutralizingProblems(errors::addFieldError)).pushPolicy();
+        settingsParser.pushPolicy(settings.asMap(), neutralizingProblems(errors::addFieldError));
     }
 
     private boolean isGitPush(RepositoryPushHookRequest push) {
@@ -100,15 +101,13 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
     }
 
     private PushPolicy pushPolicy(PreRepositoryHookContext context, RepositoryPushHookRequest push) {
-        return new SettingsParser(
-                        ruleSet,
-                        context.getSettings().asMap(),
-                        neutralizingProblems((key, problem) -> log.warn(
-                                "Ignoring invalid git-commit-sentinel-bitbucket setting {} on {}: {}",
-                                key,
-                                push.getRepository(),
-                                problem)))
-                .pushPolicy();
+        return settingsParser.pushPolicy(
+                context.getSettings().asMap(),
+                neutralizingProblems((key, problem) -> log.warn(
+                        "Ignoring invalid git-commit-sentinel-bitbucket setting {} on {}: {}",
+                        key,
+                        push.getRepository(),
+                        problem)));
     }
 
     private BiConsumer<String, String> neutralizingProblems(BiConsumer<String, String> problemSink) {
