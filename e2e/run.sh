@@ -13,8 +13,8 @@ cd "$(dirname "$0")/.."
 export BITBUCKET_VERSION=${BITBUCKET_VERSION:-9.4.13}
 export BB_URL=http://localhost:7990
 PLUGIN_KEY=com.github.bluenoah.git-commit-sentinel-bitbucket
-JAR=$(find target -maxdepth 1 -name 'git-commit-sentinel-bitbucket-*.jar' | head -1)
-POD=target/e2e-pod.yaml
+JAR=$(find bitbucket-plugin/target -maxdepth 1 -name 'git-commit-sentinel-bitbucket-*.jar' | head -1)
+POD=bitbucket-plugin/target/e2e-pod.yaml
 [ -n "$JAR" ] || { echo "plugin jar not found: run mvn package first" >&2; exit 1; }
 
 sed "s|\${BITBUCKET_VERSION}|$BITBUCKET_VERSION|" e2e/bitbucket-pod.yaml > "$POD"

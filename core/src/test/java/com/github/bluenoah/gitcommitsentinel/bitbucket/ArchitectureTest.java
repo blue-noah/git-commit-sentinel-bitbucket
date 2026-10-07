@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -33,18 +32,6 @@ class ArchitectureTest {
         // then
         then(importsOf(MAIN_SOURCES.resolve(layer))).isNotEmpty();
         then(forbiddenImports).isEmpty();
-    }
-
-    @Test
-    void outboundAdaptersNeverImportInboundOnes() {
-        // given
-        var inboundPackage = "%s.adapter.inbound.".formatted(PROJECT_PACKAGE);
-
-        // when
-        var outboundImports = importsOf(MAIN_SOURCES.resolve("adapter/outbound"));
-
-        // then
-        then(outboundImports).isNotEmpty().noneMatch(imported -> imported.startsWith(inboundPackage));
     }
 
     private List<String> importsOf(Path layerSources) {

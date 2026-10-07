@@ -19,11 +19,8 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Build, format check (Spotless), test and coverage check (JaCoCo, 100%)
-        run: mvn -B verify
-
-      - name: Mutation testing (PIT, 100% mutation score)
-        run: mvn -B org.pitest:pitest-maven:mutationCoverage
+      - name: Build, format check (Spotless), tests, coverage (JaCoCo, 100%) and mutation testing (PIT, 100%)
+        run: mvn -B verify org.pitest:pitest-maven:mutationCoverage
 
       - name: Upload coverage and mutation reports
         if: always()
@@ -31,15 +28,15 @@ jobs:
         with:
           name: quality-reports
           path: |
-            target/site/jacoco/
-            target/pit-reports/
+            */target/site/jacoco/
+            */target/pit-reports/
           if-no-files-found: ignore
 
       - name: Upload plugin jar
         uses: actions/upload-artifact@v7
         with:
           name: plugin-jar
-          path: target/git-commit-sentinel-bitbucket-*.jar
+          path: bitbucket-plugin/target/git-commit-sentinel-bitbucket-*.jar
           if-no-files-found: error
 
   e2e:

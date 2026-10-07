@@ -14,3 +14,4 @@ acceptance — a changed decision gets a new ADR that supersedes the old one.
 | [0005](0005-fail-open.md) | Fail open on internal errors |
 | [0006](0006-scope-push-only-skip-merges.md) | Only `git push`; merge commits are never checked |
 | [0007](0007-hexagonal-architecture.md) | Hexagonal architecture |
+| [0008](0008-core-and-bitbucket-plugin-modules.md) | A core module and a Bitbucket plugin module |
