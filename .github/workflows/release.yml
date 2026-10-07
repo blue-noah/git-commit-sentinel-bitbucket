@@ -31,14 +31,11 @@ jobs:
           mvn -B -ntp org.codehaus.mojo:versions-maven-plugin:2.22.0:set
           -DnewVersion=${{ steps.version.outputs.version }} -DgenerateBackupPoms=false
 
-      - name: Build, format check, test and coverage check
-        run: mvn -B verify
-
-      - name: Mutation testing
-        run: mvn -B org.pitest:pitest-maven:mutationCoverage
+      - name: Build, format check, tests, coverage and mutation testing
+        run: mvn -B verify org.pitest:pitest-maven:mutationCoverage
 
       - name: Checksum
-        working-directory: target
+        working-directory: bitbucket-plugin/target
         run: sha256sum "git-commit-sentinel-bitbucket-${{ steps.version.outputs.version }}.jar" > SHA256SUMS.txt
 
       - name: Create GitHub release
@@ -48,5 +45,5 @@ jobs:
           gh release create "${{ github.ref_name }}" \
             --title "${{ github.ref_name }}" \
             --generate-notes \
-            "target/git-commit-sentinel-bitbucket-${{ steps.version.outputs.version }}.jar" \
-            target/SHA256SUMS.txt
+            "bitbucket-plugin/target/git-commit-sentinel-bitbucket-${{ steps.version.outputs.version }}.jar" \
+            bitbucket-plugin/target/SHA256SUMS.txt

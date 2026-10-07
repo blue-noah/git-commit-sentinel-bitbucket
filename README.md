@@ -103,11 +103,18 @@ and from REST alike.
 Requires JDK 17 or 21 (`sdk env` picks it up from `.sdkmanrc`) and Maven; no
 Atlassian SDK needed.
 
+Two Maven modules, built in parallel (`-T1C` in `.mvn/maven.config`):
+
+- `core/`: the rules and the push check, plain Java with no dependencies, independent of the Bitbucket version.
+- `bitbucket-plugin/`: the Bitbucket 9.4 adapters; the plugin jar embeds `core`.
+
 ```sh
-mvn spotless:apply                           # format the code (palantir-java-format)
-mvn verify                                   # format check, tests, JaCoCo coverage check, plugin jar in target/
-mvn org.pitest:pitest-maven:mutationCoverage # mutation testing (after verify)
+mvn spotless:apply                                  # format the code (palantir-java-format)
+mvn verify                                          # format check, tests, JaCoCo coverage check, plugin jar
+mvn verify org.pitest:pitest-maven:mutationCoverage # the same, plus mutation testing
 ```
+
+The plugin jar is `bitbucket-plugin/target/git-commit-sentinel-bitbucket-<version>.jar`.
 
 Formatting is [palantir-java-format](https://github.com/palantir/palantir-java-format), applied by
 [Spotless](https://github.com/diffplug/spotless): `verify` fails on unformatted code, `spotless:apply`
@@ -115,10 +122,10 @@ fixes it.
 
 Both test quality gates are at **100%** and fail the build below it (CI runs both):
 
-- **Coverage** (JaCoCo): instructions, lines and branches. Report: `target/site/jacoco/index.html`.
+- **Coverage** (JaCoCo): instructions, lines and branches, per module: each module's own tests cover
+  it all. Report: `<module>/target/site/jacoco/index.html`.
 - **Mutation score** (PIT, `STRONGER` mutators): every mutant must be killed by an assertion.
-  Report: `target/pit-reports/index.html`. PIT's own line coverage isn't gated: unlike JaCoCo it
-  counts the private constructors of utility classes, which nothing should call.
+  Report: `<module>/target/pit-reports/index.html`.
 
 ### End-to-end tests, on a real Bitbucket
 
@@ -157,14 +164,17 @@ publishes a GitHub release with the jar and its SHA-256.
 ## Design
 
 - [docs/adr](docs/adr) — why it's built this way.
-Hexagonal architecture ([ADR 0007](docs/adr/0007-hexagonal-architecture.md)), dependencies pointing inwards only:
+Hexagonal architecture ([ADR 0007](docs/adr/0007-hexagonal-architecture.md)), dependencies pointing inwards only,
+split into Maven modules ([ADR 0008](docs/adr/0008-core-and-bitbucket-plugin-modules.md)):
 
-- `domain/` — the rules, plain Java.
-- `application/` — the push check use case, and the `PushReport` port it tells the developer through.
-- `adapter/inbound/` — where Bitbucket calls in: the repository hook, the stream of pushed commits, the hook settings.
-- `adapter/outbound/` — where the application calls out: the pusher's terminal, implementing `PushReport`.
+- `core/`
+  - `domain` — the rules, plain Java.
+  - `application` — the push check use case, and the `PushReport` port it tells the developer through.
+- `bitbucket-plugin/`
+  - `adapter.inbound` — where Bitbucket calls in: the repository hook, the stream of pushed commits, the hook settings.
+  - `adapter.outbound` — where the application calls out: the pusher's terminal, implementing `PushReport`.
 
-No bundled libraries: only APIs Bitbucket provides.
+No third-party libraries bundled: the plugin jar embeds only `core`, and uses the APIs Bitbucket provides.
 
 ## License
 

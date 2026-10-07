@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 class SourceFilesTest {
 
-    private static final List<Path> SOURCE_ROOTS = List.of(Path.of("src"), Path.of("e2e"));
+    private static final List<Path> SOURCE_ROOTS = List.of(Path.of("src"), Path.of("../core/src"), Path.of("../e2e"));
 
     @Test
     void noSourceFileContainsInvisibleOrDeceptiveCharacters() throws IOException {
