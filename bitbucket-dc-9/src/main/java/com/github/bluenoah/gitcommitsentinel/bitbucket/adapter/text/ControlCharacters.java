@@ -1,5 +1,6 @@
 package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.text;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -10,7 +11,10 @@ public final class ControlCharacters {
                     Character.PARAGRAPH_SEPARATOR);
 
     public String neutralized(String untrustedText) {
-        return untrustedText.codePoints().mapToObj(this::visibleForm).collect(Collectors.joining());
+        return Objects.requireNonNullElse(untrustedText, "")
+                .codePoints()
+                .mapToObj(this::visibleForm)
+                .collect(Collectors.joining());
     }
 
     private String visibleForm(int codePoint) {
