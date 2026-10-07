@@ -6,6 +6,7 @@
 [![license](https://img.shields.io/github/license/blue-noah/git-commit-sentinel-bitbucket)](LICENSE)
 [![quality gate](https://sonarcloud.io/api/project_badges/measure?project=blue-noah_git-commit-sentinel-bitbucket&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=blue-noah_git-commit-sentinel-bitbucket)
 [![coverage](https://sonarcloud.io/api/project_badges/measure?project=blue-noah_git-commit-sentinel-bitbucket&metric=coverage)](https://sonarcloud.io/component_measures?id=blue-noah_git-commit-sentinel-bitbucket&metric=coverage)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/blue-noah/git-commit-sentinel-bitbucket/badge)](https://scorecard.dev/viewer/?uri=github.com/blue-noah/git-commit-sentinel-bitbucket)
 ![Java 17](https://img.shields.io/badge/Java-17-informational)
 ![Bitbucket Data Center 9.4](https://img.shields.io/badge/Bitbucket%20Data%20Center-9.4-informational)
 
