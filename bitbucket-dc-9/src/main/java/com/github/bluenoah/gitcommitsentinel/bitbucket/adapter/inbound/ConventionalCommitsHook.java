@@ -65,7 +65,11 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
                                 RepositoryHookCommitFilter.ADDED_TO_REPOSITORY));
             }
         } catch (RuntimeException e) {
-            log.error("git-commit-sentinel-bitbucket failed on a push to {}; accepting it", push.getRepository(), e);
+            log.error(
+                    "git-commit-sentinel-bitbucket failed on a push to {}/{}; accepting it",
+                    push.getRepository().getProject().getKey(),
+                    push.getRepository().getSlug(),
+                    e);
             pusherTerminal.internalErrorWarning();
         }
         return RepositoryHookResult.accepted();
@@ -101,9 +105,10 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
         return settingsParser.pushPolicy(
                 context.getSettings().asMap(),
                 (key, problem) -> log.warn(
-                        "Ignoring invalid git-commit-sentinel-bitbucket setting {} on {}: {}",
+                        "Ignoring invalid git-commit-sentinel-bitbucket setting {} on {}/{}: {}",
                         key,
-                        push.getRepository(),
+                        push.getRepository().getProject().getKey(),
+                        push.getRepository().getSlug(),
                         problem));
     }
 }

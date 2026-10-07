@@ -10,7 +10,9 @@ import com.atlassian.bitbucket.hook.ScmHookDetails;
 import com.atlassian.bitbucket.hook.repository.CommitAddedDetails;
 import com.atlassian.bitbucket.hook.repository.RepositoryHookResult;
 import com.atlassian.bitbucket.hook.repository.RepositoryPushHookRequest;
+import com.atlassian.bitbucket.project.Project;
 import com.atlassian.bitbucket.repository.MinimalRef;
+import com.atlassian.bitbucket.repository.Repository;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound.PusherTerminal;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.CheckPush;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushPolicy;
@@ -55,6 +57,12 @@ class PushedCommitsListenerTest {
         var scm = mock(ScmHookDetails.class);
         given(scm.out()).willReturn(new PrintWriter(terminalOutput));
         given(push.getScmHookDetails()).willReturn(Optional.of(scm));
+        var project = mock(Project.class);
+        given(project.getKey()).willReturn("PRJ");
+        var repository = mock(Repository.class);
+        given(repository.getProject()).willReturn(project);
+        given(repository.getSlug()).willReturn("repo");
+        given(push.getRepository()).willReturn(repository);
         return push;
     }
 
