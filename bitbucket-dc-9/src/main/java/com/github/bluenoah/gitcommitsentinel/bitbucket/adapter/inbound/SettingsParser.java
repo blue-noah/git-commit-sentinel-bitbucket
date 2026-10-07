@@ -21,41 +21,48 @@ import java.util.stream.Stream;
 
 record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<String, String> reportInvalidSetting) {
 
+    private static final String BRANCH_PATTERN = "branchPattern";
+    private static final String TYPES = "types";
+    private static final String HEADER_MAX_LENGTH = "headerMaxLength";
+    private static final String BYPASS_USERS = "bypassUsers";
+    private static final String RULE_LEVEL = "rule-%s";
+    private static final String DEFAULT_LEVEL_CHOICE = "default";
+
     PushPolicy pushPolicy() {
         return new PushPolicy(
                 featureBranchPattern(),
                 new RuleConfig(allowedTypes(), headerMaxLength(), configuredLevels()),
-                Set.copyOf(listSetting(SettingsKeys.BYPASS_USERS)));
+                Set.copyOf(listSetting(BYPASS_USERS)));
     }
 
     private Pattern featureBranchPattern() {
-        return nonBlankSetting(SettingsKeys.BRANCH_PATTERN)
+        return nonBlankSetting(BRANCH_PATTERN)
                 .flatMap(this::compiledOrReported)
                 .orElse(PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN);
     }
 
     private List<String> allowedTypes() {
-        return nonBlankSetting(SettingsKeys.TYPES)
+        return nonBlankSetting(TYPES)
                 .flatMap(raw -> reportedIfEmpty(
                         Optional.of(splitOnCommasAndNewlines(raw)).filter(not(List::isEmpty)),
-                        SettingsKeys.TYPES,
+                        TYPES,
                         "List at least one type, or leave blank for the defaults."))
                 .orElse(RuleConfig.DEFAULT_ALLOWED_TYPES);
     }
 
     private int headerMaxLength() {
-        return nonBlankSetting(SettingsKeys.HEADER_MAX_LENGTH)
+        return nonBlankSetting(HEADER_MAX_LENGTH)
                 .flatMap(raw -> reportedIfEmpty(
                         positiveInteger(raw),
-                        SettingsKeys.HEADER_MAX_LENGTH,
+                        HEADER_MAX_LENGTH,
                         "Must be a positive integer, got \"%s\".".formatted(raw)))
                 .orElse(RuleConfig.DEFAULT_HEADER_MAX_LENGTH);
     }
 
     private Map<String, Level> configuredLevels() {
         return ruleSet.rulesInReportingOrder().stream()
-                .flatMap(
-                        rule -> configuredLevel(SettingsKeys.RULE_LEVEL.formatted(rule.name()))
+                .flatMap(rule ->
+                        configuredLevel(RULE_LEVEL.formatted(rule.name()))
                                 .map(level -> Map.entry(rule.name(), level))
                                 .stream())
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -82,8 +89,7 @@ record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<S
             return Optional.of(Pattern.compile(regex));
         } catch (PatternSyntaxException invalidRegex) {
             reportInvalidSetting.accept(
-                    SettingsKeys.BRANCH_PATTERN,
-                    "Invalid regular expression: %s".formatted(invalidRegex.getDescription()));
+                    BRANCH_PATTERN, "Invalid regular expression: %s".formatted(invalidRegex.getDescription()));
             return Optional.empty();
         }
     }
@@ -110,7 +116,7 @@ record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<S
 
     private String acceptedLevelChoices() {
         return Stream.concat(
-                        Stream.of(SettingsKeys.DEFAULT_LEVEL_CHOICE),
+                        Stream.of(DEFAULT_LEVEL_CHOICE),
                         Arrays.stream(Level.values()).map(this::levelChoice))
                 .collect(Collectors.joining(", "));
     }
@@ -120,7 +126,7 @@ record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<S
     }
 
     private boolean isDefaultLevelChoice(String raw) {
-        return raw.strip().equalsIgnoreCase(SettingsKeys.DEFAULT_LEVEL_CHOICE);
+        return raw.strip().equalsIgnoreCase(DEFAULT_LEVEL_CHOICE);
     }
 
     private Optional<Integer> positiveInteger(String raw) {

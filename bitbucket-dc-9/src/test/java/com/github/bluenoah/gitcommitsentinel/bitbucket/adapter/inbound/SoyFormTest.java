@@ -18,11 +18,7 @@ class SoyFormTest {
     @Test
     void formHasAFieldForEverySettingAndRule() throws IOException {
         // given
-        var settingKeys = List.of(
-                SettingsKeys.BRANCH_PATTERN,
-                SettingsKeys.TYPES,
-                SettingsKeys.HEADER_MAX_LENGTH,
-                SettingsKeys.BYPASS_USERS);
+        var settingKeys = List.of("branchPattern", "types", "headerMaxLength", "bypassUsers");
 
         // when
         var soy = resource("/static/sentinel.soy");
@@ -34,7 +30,7 @@ class SoyFormTest {
                 .forEach(rule -> then(soy)
                         .as("level of rule %s", rule.name())
                         .contains("{param rule: '%s' /}".formatted(rule.name())));
-        then(soy).contains("value=\"%s\"".formatted(SettingsKeys.DEFAULT_LEVEL_CHOICE));
+        then(soy).contains("value=\"%s\"".formatted("default"));
         Arrays.stream(Level.values())
                 .forEach(level ->
                         then(soy).contains("value=\"%s\"".formatted(level.name().toLowerCase(Locale.ROOT))));
