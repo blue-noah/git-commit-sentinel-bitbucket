@@ -1,4 +1,4 @@
-package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound;
+package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.settings;
 
 import static java.util.function.Predicate.not;
 
@@ -19,7 +19,8 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<String, String> reportInvalidSetting) {
+public record SettingsParser(
+        RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<String, String> reportInvalidSetting) {
 
     private static final String BRANCH_PATTERN = "branchPattern";
     private static final String TYPES = "types";
@@ -28,7 +29,7 @@ record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<S
     private static final String RULE_LEVEL = "rule-%s";
     private static final String DEFAULT_LEVEL_CHOICE = "default";
 
-    PushPolicy pushPolicy() {
+    public PushPolicy pushPolicy() {
         return new PushPolicy(
                 featureBranchPattern(),
                 new RuleConfig(allowedTypes(), headerMaxLength(), configuredLevels()),
