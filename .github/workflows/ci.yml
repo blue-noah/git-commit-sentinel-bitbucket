@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: plugin-jar
-          path: bitbucket-plugin/target/git-commit-sentinel-bitbucket-*.jar
+          path: bitbucket-dc-9/target/git-commit-sentinel-bitbucket-dc-9-*.jar
           if-no-files-found: error
 
   e2e:

@@ -106,7 +106,7 @@ Atlassian SDK needed.
 Two Maven modules, built in parallel (`-T1C` in `.mvn/maven.config`):
 
 - `core/`: the rules and the push check, plain Java with no dependencies, independent of the Bitbucket version.
-- `bitbucket-plugin/`: the Bitbucket 9.4 adapters; the plugin jar embeds `core`.
+- `bitbucket-dc-9/`: the Bitbucket Data Center 9 plugin: its adapters, embedding `core`.
 
 ```sh
 mvn spotless:apply                                  # format the code (palantir-java-format)
@@ -114,7 +114,7 @@ mvn verify                                          # format check, tests, JaCoC
 mvn verify org.pitest:pitest-maven:mutationCoverage # the same, plus mutation testing
 ```
 
-The plugin jar is `bitbucket-plugin/target/git-commit-sentinel-bitbucket-<version>.jar`.
+The plugin jar is `bitbucket-dc-9/target/git-commit-sentinel-bitbucket-dc-9-<version>.jar`.
 
 Formatting is [palantir-java-format](https://github.com/palantir/palantir-java-format), applied by
 [Spotless](https://github.com/diffplug/spotless): `verify` fails on unformatted code, `spotless:apply`
@@ -150,7 +150,7 @@ installs the plugin through the REST API as an admin would, runs `e2e/e2e.sh` an
 
 ## Install
 
-Upload `git-commit-sentinel-bitbucket-<version>.jar`, from the [latest
+Upload `git-commit-sentinel-bitbucket-dc-9-<version>.jar`, from the [latest
 release](https://github.com/blue-noah/git-commit-sentinel-bitbucket/releases) (checksum in `SHA256SUMS.txt`),
 from *Administration → Manage apps → Upload app*. Recent Bitbucket releases disable uploading apps by default ("Plugins cannot be
 installed via upload"): start Bitbucket with `-Dupm.plugin.upload.enabled=true` (e.g. in
@@ -170,7 +170,7 @@ split into Maven modules ([ADR 0008](docs/adr/0008-core-and-bitbucket-plugin-mod
 - `core/`
   - `domain` — the rules, plain Java.
   - `application` — the push check use case, and the `PushReport` port it tells the developer through.
-- `bitbucket-plugin/`
+- `bitbucket-dc-9/`
   - `adapter.inbound` — where Bitbucket calls in: the repository hook, the stream of pushed commits, the hook settings.
   - `adapter.outbound` — where the application calls out: the pusher's terminal, implementing `PushReport`.
 
