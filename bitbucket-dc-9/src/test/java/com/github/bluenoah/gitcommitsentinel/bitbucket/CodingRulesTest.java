@@ -9,6 +9,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchCondition;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class CodingRulesTest {
@@ -75,6 +76,25 @@ class CodingRulesTest {
                 .doNotHaveSimpleName("PusherTerminal")
                 .should()
                 .callMethod(ScmHookDetails.class, "out");
+
+        // when / then
+        rule.check(productionClasses);
+    }
+
+    @Test
+    void onlyTheClassesThatQuoteUntrustedTextNeutralizeIt() {
+        // given
+        var rule = noClasses()
+                .that(describe(
+                        "are not PusherTerminal, SettingsParser or ControlCharacters",
+                        javaClass -> !Set.of("PusherTerminal", "SettingsParser", "ControlCharacters")
+                                .contains(javaClass
+                                        .getEnclosingClass()
+                                        .orElse(javaClass)
+                                        .getSimpleName())))
+                .should()
+                .dependOnClassesThat()
+                .haveSimpleName("ControlCharacters");
 
         // when / then
         rule.check(productionClasses);

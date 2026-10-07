@@ -138,4 +138,15 @@ class SettingsParserTest {
         // then
         then(reportedProblems).containsKey("headerMaxLength");
     }
+
+    @Test
+    void theValueEchoedInAProblemHasItsControlCharactersNeutralized() {
+        // when
+        parse(Map.of("headerMaxLength", "7\u001b[2J", "rule-type", "\u202Eerror"));
+
+        // then
+        then(reportedProblems)
+                .containsEntry("headerMaxLength", "Must be a positive integer, got \"7\\u{1b}[2J\".")
+                .containsEntry("rule-type", "Must be one of default, off, warn, error, got \"\\u{202e}error\".");
+    }
 }
