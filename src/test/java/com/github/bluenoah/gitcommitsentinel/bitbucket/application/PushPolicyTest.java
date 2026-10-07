@@ -9,20 +9,20 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-class SentinelConfigTest {
+class PushPolicyTest {
 
     private static final RuleConfig DEFAULTS =
             new RuleConfig(RuleConfig.DEFAULT_ALLOWED_TYPES, RuleConfig.DEFAULT_HEADER_MAX_LENGTH, Map.of());
 
-    private SentinelConfig config(Pattern featureBranchPattern, Set<String> bypassUsernames) {
-        return new SentinelConfig(featureBranchPattern, DEFAULTS, bypassUsernames);
+    private PushPolicy policy(Pattern featureBranchPattern, Set<String> bypassUsernames) {
+        return new PushPolicy(featureBranchPattern, DEFAULTS, bypassUsernames);
     }
 
     @ParameterizedTest(name = "{0} -> feature branch: {1}")
     @CsvSource({"feature/ABC-1, true", "main, false", "my-feature/x, false"})
     void theDefaultPatternMatchesTheWholeBranchName(String branchName, boolean featureBranch) {
         // given
-        var sut = config(SentinelConfig.DEFAULT_FEATURE_BRANCH_PATTERN, Set.of());
+        var sut = policy(PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN, Set.of());
 
         // when
         var isFeatureBranch = sut.isFeatureBranch(branchName);
@@ -42,7 +42,7 @@ class SentinelConfigTest {
     })
     void everyBranchExceptTheProtectedOnesPatternFromAdr0001(String branchName, boolean featureBranch) {
         // given
-        var sut = config(Pattern.compile("(?!main$|develop$|release/).+"), Set.of());
+        var sut = policy(Pattern.compile("(?!main$|develop$|release/).+"), Set.of());
 
         // when
         var isFeatureBranch = sut.isFeatureBranch(branchName);
@@ -55,7 +55,7 @@ class SentinelConfigTest {
     @CsvSource({"CI-Bot, true", "ci-bot, true", "alice, false"})
     void listedUsernamesAreExemptIgnoringCase(String username, boolean exempt) {
         // given
-        var sut = config(SentinelConfig.DEFAULT_FEATURE_BRANCH_PATTERN, Set.of("CI-Bot"));
+        var sut = policy(PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN, Set.of("CI-Bot"));
 
         // when
         var exempts = sut.exempts(username);

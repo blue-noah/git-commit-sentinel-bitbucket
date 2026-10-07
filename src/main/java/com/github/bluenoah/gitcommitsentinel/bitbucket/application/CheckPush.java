@@ -16,20 +16,20 @@ public final class CheckPush {
     }
 
     public Optional<PushedCommitsCheck> start(
-            List<PushedRef> pushedRefs, Optional<String> pusher, SentinelConfig config, PushReport report) {
+            List<PushedRef> pushedRefs, Optional<String> pusher, PushPolicy policy, PushReport report) {
         var featureBranchRefIds = pushedRefs.stream()
                 .filter(PushedRef::isBranch)
                 .filter(not(PushedRef::isDeleted))
-                .filter(branch -> config.isFeatureBranch(branch.name()))
+                .filter(branch -> policy.isFeatureBranch(branch.name()))
                 .map(PushedRef::id)
                 .collect(Collectors.toUnmodifiableSet());
         if (featureBranchRefIds.isEmpty()) {
             return Optional.empty();
         }
-        var exemptPusher = pusher.filter(config::exempts);
+        var exemptPusher = pusher.filter(policy::exempts);
         exemptPusher.ifPresent(report::checksSkippedFor);
         return exemptPusher.isEmpty()
-                ? Optional.of(new PushedCommitsCheck(ruleSet, config.ruleConfig(), featureBranchRefIds, report))
+                ? Optional.of(new PushedCommitsCheck(ruleSet, policy.ruleConfig(), featureBranchRefIds, report))
                 : Optional.empty();
     }
 }

@@ -4,7 +4,7 @@ import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleConfig;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public record SentinelConfig(Pattern featureBranchPattern, RuleConfig ruleConfig, Set<String> bypassUsernames) {
+public record PushPolicy(Pattern featureBranchPattern, RuleConfig ruleConfig, Set<String> bypassUsernames) {
 
     public static final Pattern DEFAULT_FEATURE_BRANCH_PATTERN = Pattern.compile("feature/.+");
 

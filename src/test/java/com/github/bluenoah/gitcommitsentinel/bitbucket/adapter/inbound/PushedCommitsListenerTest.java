@@ -13,8 +13,8 @@ import com.atlassian.bitbucket.hook.repository.RepositoryPushHookRequest;
 import com.atlassian.bitbucket.repository.MinimalRef;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound.PusherTerminal;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.CheckPush;
+import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushPolicy;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushedRef;
-import com.github.bluenoah.gitcommitsentinel.bitbucket.application.SentinelConfig;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleConfig;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleSet;
 import java.io.PrintWriter;
@@ -36,15 +36,15 @@ class PushedCommitsListenerTest {
             pushedCommitsListener(PusherTerminal.of(pushWithTerminal(terminalOutput)));
 
     private PushedCommitsListener pushedCommitsListener(PusherTerminal pusherTerminal) {
-        var config = new SentinelConfig(
-                SentinelConfig.DEFAULT_FEATURE_BRANCH_PATTERN,
+        var policy = new PushPolicy(
+                PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN,
                 new RuleConfig(RuleConfig.DEFAULT_ALLOWED_TYPES, RuleConfig.DEFAULT_HEADER_MAX_LENGTH, Map.of()),
                 Set.of());
         var pushedCommitsCheck = new CheckPush(RuleSet.standard())
                 .start(
                         List.of(new PushedRef(FEATURE, "feature/x", true, false)),
                         Optional.empty(),
-                        config,
+                        policy,
                         pusherTerminal)
                 .orElseThrow();
         return new PushedCommitsListener(pushedCommitsCheck, pusherTerminal);

@@ -3,11 +3,9 @@ package com.github.bluenoah.gitcommitsentinel.bitbucket.application;
 import static com.github.bluenoah.gitcommitsentinel.bitbucket.application.CheckPushTest.commit;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.times;
 
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.Level;
@@ -110,7 +108,7 @@ class PushedCommitsCheckTest {
     @Test
     void theReportIsCappedButEveryErrorStillCounts() {
         // given
-        var commitsWithErrors = PushedCommitsCheck.MAX_COMMITS_REPORTED_IN_FULL + 5;
+        var commitsWithErrors = CappedReport.MAX_COMMITS_SHOWN + 5;
         checkTheSameCommit(commitsWithErrors, "wip: stuff");
 
         // when
@@ -118,21 +116,7 @@ class PushedCommitsCheckTest {
 
         // then
         then(verdict.commitsWithErrors()).isEqualTo(commitsWithErrors);
-        BDDMockito.then(report)
-                .should(times(PushedCommitsCheck.MAX_COMMITS_REPORTED_IN_FULL))
-                .violations(any(), any());
+        BDDMockito.then(report).should(times(CappedReport.MAX_COMMITS_SHOWN)).violations(any(), any());
         BDDMockito.then(report).should().commitsWithViolationsNotShown(5);
-    }
-
-    @Test
-    void upToTheCapEveryCommitIsReportedInFull() {
-        // given
-        checkTheSameCommit(PushedCommitsCheck.MAX_COMMITS_REPORTED_IN_FULL, "wip: stuff");
-
-        // when
-        sut.finish();
-
-        // then
-        BDDMockito.then(report).should(never()).commitsWithViolationsNotShown(anyInt());
     }
 }
