@@ -139,7 +139,7 @@ class ConventionalCommitsHookTest {
     @Test
     void theHookSettingsReachTheUseCaseAndInvalidOnesAreIgnored() {
         // given
-        givenHookSettings(Map.of(SettingsKeys.TYPES, "task", SettingsKeys.HEADER_MAX_LENGTH, "x"));
+        givenHookSettings(Map.of("types", "task", "headerMaxLength", "x"));
 
         // when
         sut.preUpdate(context, push(branch("feature/x", RefChangeType.ADD)));
@@ -153,7 +153,7 @@ class ConventionalCommitsHookTest {
     @Test
     void thePusherNameReachesTheUseCase() {
         // given
-        givenHookSettings(Map.of(SettingsKeys.BYPASS_USERS, "alice"));
+        givenHookSettings(Map.of("bypassUsers", "alice"));
 
         // when
         sut.preUpdate(context, push(branch("feature/x", RefChangeType.UPDATE)));
@@ -167,7 +167,7 @@ class ConventionalCommitsHookTest {
     void anAnonymousPushIsChecked() {
         // given
         given(authenticationContext.getCurrentUser()).willReturn(null);
-        givenHookSettings(Map.of(SettingsKeys.BYPASS_USERS, "alice"));
+        givenHookSettings(Map.of("bypassUsers", "alice"));
 
         // when
         sut.preUpdate(context, push(branch("feature/x", RefChangeType.UPDATE)));
@@ -260,20 +260,20 @@ class ConventionalCommitsHookTest {
     @Test
     void validateReportsEveryInvalidFieldToTheForm() {
         // given
-        var settings = settings(Map.of(SettingsKeys.BRANCH_PATTERN, "feature/(", SettingsKeys.HEADER_MAX_LENGTH, 0));
+        var settings = settings(Map.of("branchPattern", "feature/(", "headerMaxLength", 0));
 
         // when
         sut.validate(settings, formErrors, mock(Scope.class));
 
         // then
-        BDDMockito.then(formErrors).should().addFieldError(eq(SettingsKeys.BRANCH_PATTERN), anyString());
-        BDDMockito.then(formErrors).should().addFieldError(eq(SettingsKeys.HEADER_MAX_LENGTH), anyString());
+        BDDMockito.then(formErrors).should().addFieldError(eq("branchPattern"), anyString());
+        BDDMockito.then(formErrors).should().addFieldError(eq("headerMaxLength"), anyString());
     }
 
     @Test
     void problemsShownOnTheFormHaveTheirControlCharactersNeutralized() {
         // given
-        var settings = settings(Map.of(SettingsKeys.HEADER_MAX_LENGTH, "7\u001b[2J"));
+        var settings = settings(Map.of("headerMaxLength", "7\u001b[2J"));
 
         // when
         sut.validate(settings, formErrors, mock(Scope.class));
@@ -281,13 +281,13 @@ class ConventionalCommitsHookTest {
         // then
         BDDMockito.then(formErrors)
                 .should()
-                .addFieldError(SettingsKeys.HEADER_MAX_LENGTH, "Must be a positive integer, got \"7\\u{1b}[2J\".");
+                .addFieldError("headerMaxLength", "Must be a positive integer, got \"7\\u{1b}[2J\".");
     }
 
     @Test
     void validateAcceptsValidSettings() {
         // given
-        var settings = settings(Map.of(SettingsKeys.TYPES, "feat", SettingsKeys.HEADER_MAX_LENGTH, 72));
+        var settings = settings(Map.of("types", "feat", "headerMaxLength", 72));
 
         // when
         sut.validate(settings, formErrors, mock(Scope.class));

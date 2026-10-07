@@ -36,15 +36,15 @@ class SettingsParserTest {
     void configuredValuesReplaceTheDefaultsAndBlankKeepsThem() {
         // given
         var hookSettings = Map.of(
-                SettingsKeys.BRANCH_PATTERN,
+                "branchPattern",
                 "(feature|story)/.+",
-                SettingsKeys.TYPES,
+                "types",
                 " feat, task ",
-                SettingsKeys.HEADER_MAX_LENGTH,
+                "headerMaxLength",
                 " ",
-                SettingsKeys.RULE_LEVEL.formatted("type"),
+                "rule-type",
                 "WARN",
-                SettingsKeys.RULE_LEVEL.formatted("format"),
+                "rule-format",
                 "default");
 
         // when
@@ -61,7 +61,7 @@ class SettingsParserTest {
     @Test
     void bypassUsersAcceptCommasOrNewlinesAndAreKeptAsTyped() {
         // given
-        var hookSettings = Map.of(SettingsKeys.BYPASS_USERS, "CI-Bot,\n alice ");
+        var hookSettings = Map.of("bypassUsers", "CI-Bot,\n alice ");
 
         // when
         var policy = parse(hookSettings);
@@ -73,26 +73,14 @@ class SettingsParserTest {
     @Test
     void invalidValuesAreReportedAndFallBackToTheDefaults() {
         // given
-        var hookSettings = Map.of(
-                SettingsKeys.BRANCH_PATTERN,
-                "feature/(",
-                SettingsKeys.HEADER_MAX_LENGTH,
-                "0",
-                SettingsKeys.TYPES,
-                " , ",
-                SettingsKeys.RULE_LEVEL.formatted("type"),
-                "fatal");
+        var hookSettings =
+                Map.of("branchPattern", "feature/(", "headerMaxLength", "0", "types", " , ", "rule-type", "fatal");
 
         // when
         var policy = parse(hookSettings);
 
         // then
-        then(reportedProblems)
-                .containsOnlyKeys(
-                        SettingsKeys.BRANCH_PATTERN,
-                        SettingsKeys.HEADER_MAX_LENGTH,
-                        SettingsKeys.TYPES,
-                        SettingsKeys.RULE_LEVEL.formatted("type"));
+        then(reportedProblems).containsOnlyKeys("branchPattern", "headerMaxLength", "types", "rule-type");
         then(policy.featureBranchPattern()).isEqualTo(PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN);
         then(policy.ruleConfig().headerMaxLength()).isEqualTo(RuleConfig.DEFAULT_HEADER_MAX_LENGTH);
         then(policy.ruleConfig().allowedTypes()).isEqualTo(RuleConfig.DEFAULT_ALLOWED_TYPES);
@@ -103,11 +91,11 @@ class SettingsParserTest {
     void restJsonNumbersAreReadAsText() {
         // given
         var json = new HashMap<String, Object>();
-        json.put(SettingsKeys.HEADER_MAX_LENGTH, 72);
-        json.put(SettingsKeys.TYPES, "feat,fix");
-        json.put(SettingsKeys.BYPASS_USERS, "CI-Bot,release");
-        json.put(SettingsKeys.RULE_LEVEL.formatted("type"), "warn");
-        json.put(SettingsKeys.BRANCH_PATTERN, null);
+        json.put("headerMaxLength", 72);
+        json.put("types", "feat,fix");
+        json.put("bypassUsers", "CI-Bot,release");
+        json.put("rule-type", "warn");
+        json.put("branchPattern", null);
 
         // when
         var policy = parse(json);
@@ -124,34 +112,30 @@ class SettingsParserTest {
     @Test
     void nonTextValuesThatMakeNoSenseAreProblemsNotExceptions() {
         // given
-        var json = Map.of(SettingsKeys.HEADER_MAX_LENGTH, true, SettingsKeys.RULE_LEVEL.formatted("format"), 3);
+        var json = Map.of("headerMaxLength", true, "rule-format", 3);
 
         // when
         parse(json);
 
         // then
-        then(reportedProblems)
-                .containsOnlyKeys(SettingsKeys.HEADER_MAX_LENGTH, SettingsKeys.RULE_LEVEL.formatted("format"));
+        then(reportedProblems).containsOnlyKeys("headerMaxLength", "rule-format");
     }
 
     @Test
     void invalidLevelMessageListsEveryAcceptedChoice() {
         // when
-        parse(Map.of(SettingsKeys.RULE_LEVEL.formatted("type"), "fatal"));
+        parse(Map.of("rule-type", "fatal"));
 
         // then
-        then(reportedProblems)
-                .containsEntry(
-                        SettingsKeys.RULE_LEVEL.formatted("type"),
-                        "Must be one of default, off, warn, error, got \"fatal\".");
+        then(reportedProblems).containsEntry("rule-type", "Must be one of default, off, warn, error, got \"fatal\".");
     }
 
     @Test
     void nonNumericHeaderLengthIsAProblemNotAnException() {
         // when
-        parse(Map.of(SettingsKeys.HEADER_MAX_LENGTH, "seventy"));
+        parse(Map.of("headerMaxLength", "seventy"));
 
         // then
-        then(reportedProblems).containsKey(SettingsKeys.HEADER_MAX_LENGTH);
+        then(reportedProblems).containsKey("headerMaxLength");
     }
 }
