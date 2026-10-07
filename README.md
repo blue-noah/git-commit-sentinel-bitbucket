@@ -1,5 +1,12 @@
 # git-commit-sentinel-bitbucket
 
+[![ci](https://github.com/blue-noah/git-commit-sentinel-bitbucket/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/blue-noah/git-commit-sentinel-bitbucket/actions/workflows/ci.yml)
+[![codeql](https://github.com/blue-noah/git-commit-sentinel-bitbucket/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/blue-noah/git-commit-sentinel-bitbucket/actions/workflows/codeql.yml)
+[![release](https://img.shields.io/github/v/release/blue-noah/git-commit-sentinel-bitbucket?sort=semver)](https://github.com/blue-noah/git-commit-sentinel-bitbucket/releases)
+[![license](https://img.shields.io/github/license/blue-noah/git-commit-sentinel-bitbucket)](LICENSE)
+![Java 17](https://img.shields.io/badge/Java-17-informational)
+![Bitbucket Data Center 9.4](https://img.shields.io/badge/Bitbucket%20Data%20Center-9.4-informational)
+
 A Bitbucket Data Center 9.4 plugin that checks commits pushed to feature
 branches against [Conventional Commits](https://www.conventionalcommits.org/),
 with independently configurable `off`/`warn`/`error` levels per rule.
