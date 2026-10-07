@@ -2,6 +2,7 @@ package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.settings
 
 import static java.util.function.Predicate.not;
 
+import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.text.ControlCharacters;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushPolicy;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.Level;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleConfig;
@@ -35,17 +36,21 @@ public final class SettingsParser {
     private static final String DEFAULT_LEVEL_CHOICE = "default";
 
     private final RuleSet ruleSet;
+    private final ControlCharacters controlCharacters = new ControlCharacters();
 
     public SettingsParser(RuleSet ruleSet) {
         this.ruleSet = ruleSet;
     }
 
     public PushPolicy pushPolicy(Map<String, ?> hookSettings, BiConsumer<String, String> reportInvalidSetting) {
-        return new Parsing(ruleSet, hookSettings, reportInvalidSetting).pushPolicy();
+        return new Parsing(ruleSet, controlCharacters, hookSettings, reportInvalidSetting).pushPolicy();
     }
 
     private record Parsing(
-            RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<String, String> reportInvalidSetting) {
+            RuleSet ruleSet,
+            ControlCharacters controlCharacters,
+            Map<String, ?> hookSettings,
+            BiConsumer<String, String> reportInvalidSetting) {
 
         PushPolicy pushPolicy() {
             return new PushPolicy(
@@ -74,7 +79,7 @@ public final class SettingsParser {
                     .flatMap(raw -> reportedIfEmpty(
                             positiveInteger(raw),
                             HEADER_MAX_LENGTH,
-                            "Must be a positive integer, got \"%s\".".formatted(raw)))
+                            "Must be a positive integer, got \"%s\".".formatted(controlCharacters.neutralized(raw))))
                     .orElse(RuleConfig.DEFAULT_HEADER_MAX_LENGTH);
         }
 
@@ -91,7 +96,10 @@ public final class SettingsParser {
             return nonBlankSetting(key)
                     .filter(not(this::isDefaultLevelChoice))
                     .flatMap(raw -> reportedIfEmpty(
-                            level(raw), key, "Must be one of %s, got \"%s\".".formatted(acceptedLevelChoices(), raw)));
+                            level(raw),
+                            key,
+                            "Must be one of %s, got \"%s\"."
+                                    .formatted(acceptedLevelChoices(), controlCharacters.neutralized(raw))));
         }
 
         private Optional<String> nonBlankSetting(String key) {

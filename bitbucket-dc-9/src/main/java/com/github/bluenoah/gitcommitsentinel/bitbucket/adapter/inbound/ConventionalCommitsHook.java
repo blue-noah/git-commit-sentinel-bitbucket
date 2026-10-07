@@ -18,13 +18,11 @@ import com.atlassian.bitbucket.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.settings.SettingsParser;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound.PusherTerminal;
-import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.text.ControlCharacters;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.CheckPush;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushPolicy;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushedRef;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -42,7 +40,6 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
     private final CheckPush checkPush;
     private final SettingsParser settingsParser;
     private final AuthenticationContext authenticationContext;
-    private final ControlCharacters controlCharacters = new ControlCharacters();
 
     @Inject
     public ConventionalCommitsHook(
@@ -76,7 +73,7 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
 
     @Override
     public void validate(@Nonnull Settings settings, @Nonnull SettingsValidationErrors errors, @Nonnull Scope scope) {
-        settingsParser.pushPolicy(settings.asMap(), neutralizingProblems(errors::addFieldError));
+        settingsParser.pushPolicy(settings.asMap(), errors::addFieldError);
     }
 
     private boolean isGitPush(RepositoryPushHookRequest push) {
@@ -103,14 +100,10 @@ public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPush
     private PushPolicy pushPolicy(PreRepositoryHookContext context, RepositoryPushHookRequest push) {
         return settingsParser.pushPolicy(
                 context.getSettings().asMap(),
-                neutralizingProblems((key, problem) -> log.warn(
+                (key, problem) -> log.warn(
                         "Ignoring invalid git-commit-sentinel-bitbucket setting {} on {}: {}",
                         key,
                         push.getRepository(),
-                        problem)));
-    }
-
-    private BiConsumer<String, String> neutralizingProblems(BiConsumer<String, String> problemSink) {
-        return (key, problem) -> problemSink.accept(key, controlCharacters.neutralized(problem));
+                        problem));
     }
 }
