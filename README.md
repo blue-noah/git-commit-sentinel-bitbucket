@@ -4,6 +4,8 @@
 [![codeql](https://github.com/blue-noah/git-commit-sentinel-bitbucket/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/blue-noah/git-commit-sentinel-bitbucket/actions/workflows/codeql.yml)
 [![release](https://img.shields.io/github/v/release/blue-noah/git-commit-sentinel-bitbucket?sort=semver)](https://github.com/blue-noah/git-commit-sentinel-bitbucket/releases)
 [![license](https://img.shields.io/github/license/blue-noah/git-commit-sentinel-bitbucket)](LICENSE)
+[![quality gate](https://sonarcloud.io/api/project_badges/measure?project=blue-noah_git-commit-sentinel-bitbucket&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=blue-noah_git-commit-sentinel-bitbucket)
+[![coverage](https://sonarcloud.io/api/project_badges/measure?project=blue-noah_git-commit-sentinel-bitbucket&metric=coverage)](https://sonarcloud.io/component_measures?id=blue-noah_git-commit-sentinel-bitbucket&metric=coverage)
 ![Java 17](https://img.shields.io/badge/Java-17-informational)
 ![Bitbucket Data Center 9.4](https://img.shields.io/badge/Bitbucket%20Data%20Center-9.4-informational)
 
