@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<develocity>
+    <buildScan>
+        <termsOfUse>
+            <url>https://gradle.com/help/legal-terms-of-use</url>
+            <accept>true</accept>
+        </termsOfUse>
+        <publishing>
+            <onlyIf><![CDATA[env['GITHUB_REF'] == 'refs/heads/main' && env['GITHUB_EVENT_NAME'] == 'push' && env['GITHUB_JOB'] == 'test']]></onlyIf>
+        </publishing>
+        <backgroundBuildScanUpload>#{env['CI'] == null}</backgroundBuildScanUpload>
+    </buildScan>
+    <buildCache>
+        <local>
+            <enabled>false</enabled>
+        </local>
+        <remote>
+            <enabled>false</enabled>
+        </remote>
+    </buildCache>
+</develocity>
