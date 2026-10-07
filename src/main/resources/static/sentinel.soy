@@ -1,13 +1,13 @@
-{namespace com.github.bluenoah.commitsentinel}
+{namespace com.github.bluenoah.gitcommitsentinel.bitbucket}
 
 /**
- * Hook settings form (Project or Repository settings → Hooks → Git Commit Sentinel).
+ * Hook settings form (Project or Repository settings → Hooks → Git Commit Sentinel for Bitbucket).
  * Field names match SettingsKeys.java and the rule names match RuleSet.standard() (SoyFormTest checks both).
  * @param config
  * @param? errors
  */
 {template .hookForm}
-    <p>Blank fields and <em>default</em> levels use the built-in defaults, the same as git-commit-sentinel's.</p>
+    <p>Blank fields and <em>default</em> levels use the built-in defaults.</p>
     {call .text}
         {param name: 'branchPattern' /}
         {param label: 'Feature branch regex' /}

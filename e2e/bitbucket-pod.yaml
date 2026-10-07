@@ -4,7 +4,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: commit-sentinel-e2e
+  name: git-commit-sentinel-bitbucket-e2e
 spec:
   restartPolicy: Never
   containers:
@@ -23,7 +23,7 @@ spec:
         - name: JVM_SUPPORT_RECOMMENDED_ARGS
           value: -Dupm.plugin.upload.enabled=true
         - name: SETUP_DISPLAYNAME
-          value: Commit Sentinel e2e
+          value: git-commit-sentinel-bitbucket e2e
         - name: SETUP_BASEURL
           value: http://localhost:7990
         - name: SETUP_SYSADMIN_USERNAME

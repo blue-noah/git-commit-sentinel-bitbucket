@@ -9,7 +9,7 @@
     <version>0.1.0-SNAPSHOT</version>
     <packaging>atlassian-plugin</packaging>
 
-    <name>Git Commit Sentinel</name>
+    <name>Git Commit Sentinel for Bitbucket</name>
     <description>Rejects or warns about pushes to feature branches whose commit messages are not Conventional Commits.</description>
     <url>https://github.com/blue-noah/git-commit-sentinel-bitbucket</url>
 
@@ -316,10 +316,10 @@
                 </dependencies>
                 <configuration>
                     <targetClasses>
-                        <param>com.github.bluenoah.commitsentinel.*</param>
+                        <param>com.github.bluenoah.gitcommitsentinel.bitbucket.*</param>
                     </targetClasses>
                     <targetTests>
-                        <param>com.github.bluenoah.commitsentinel.*</param>
+                        <param>com.github.bluenoah.gitcommitsentinel.bitbucket.*</param>
                     </targetTests>
                     <mutators>
                         <mutator>STRONGER</mutator>

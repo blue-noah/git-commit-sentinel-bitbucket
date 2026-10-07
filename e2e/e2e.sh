@@ -5,7 +5,7 @@ BB=${BB_URL:-http://localhost:7990}
 SCM=${BB/:\/\//://admin:admin@}/scm
 AUTH=admin:admin
 PLUGIN=com.github.bluenoah.git-commit-sentinel-bitbucket
-HOOK=$PLUGIN:commit-sentinel-hook
+HOOK=$PLUGIN:git-commit-sentinel-bitbucket-hook
 WORK=$(mktemp -d)
 PASS=0; FAIL=0
 RUN=$(date +%H%M%S); P=T$RUN; P2=U$RUN   # fresh projects every run
@@ -55,7 +55,7 @@ out=$(push_msg "$D" feature/c "feat: add thing");  expect "valid message accepte
 out=$(push_msg "$D" feature/d "fix: the bug.");    expect "warning shown, push accepted" 0 'warning: \[description-period\]' "$out" $?
 out=$(push_msg "$D" bugfix/e "wip: stuff");        expect "non-feature branch ignored" 0 "" "$out" $?
 out=$(push_msg "$F" feature/x "wip: stuff");       expect "other project unaffected" 0 "" "$out" $?
-n=$(grep -c 'git-commit-sentinel: ' <<<"$(push_msg "$D" feature/once "fix: trailing.")")
+n=$(grep -c 'git-commit-sentinel-bitbucket: ' <<<"$(push_msg "$D" feature/once "fix: trailing.")")
 [ "$n" = 2 ] && ok "each commit checked once" || ko "expected 2 sentinel lines, got $n"
 
 echo "== merge commits are skipped"

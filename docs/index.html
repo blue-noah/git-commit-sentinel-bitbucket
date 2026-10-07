@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>git-commit-sentinel for Bitbucket</title>
+<title>git-commit-sentinel-bitbucket</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -99,7 +99,7 @@
 </head>
 <body>
 <main>
-  <h1>git-commit-sentinel for Bitbucket</h1>
+  <h1>git-commit-sentinel-bitbucket</h1>
   <p class="tagline">A Bitbucket Data Center plugin that checks pushes to feature branches against Conventional Commits.</p>
   <span class="badge">Bitbucket Data Center 9.4 · Java 17 · off / warn / error per rule</span>
 
@@ -116,10 +116,10 @@
 
   <h2>On every push</h2>
   <pre><code>$ git push origin feature/login
-remote: git-commit-sentinel: 1a2b3c4 on feature/login: "wip: stuff"
-remote: git-commit-sentinel:   error: [type] type "wip" is not in the allowed list: feat, fix, ...
-remote: git-commit-sentinel: 5d6e7f8 on feature/login: "fix: the bug."
-remote: git-commit-sentinel:   warning: [description-period] description must not end with a period
+remote: git-commit-sentinel-bitbucket: 1a2b3c4 on feature/login: "wip: stuff"
+remote: git-commit-sentinel-bitbucket:   error: [type] type "wip" is not in the allowed list: feat, fix, ...
+remote: git-commit-sentinel-bitbucket: 5d6e7f8 on feature/login: "fix: the bug."
+remote: git-commit-sentinel-bitbucket:   warning: [description-period] description must not end with a period
  ! [remote rejected] feature/login -&gt; feature/login (pre-receive hook declined)</code></pre>
   <p>Only commits new to the repository are checked, on feature branches (<code>feature/.+</code> by default).
     Merge commits, tags and other branches never are. Control characters in commit messages and branch names are
@@ -137,12 +137,12 @@ remote: git-commit-sentinel:   warning: [description-period] description must no
   </table>
 
   <h2>Configure</h2>
-  <p>Enable <strong>Git Commit Sentinel</strong> in a project's <em>Settings → Hooks</em>: every repository of the
+  <p>Enable <strong>Git Commit Sentinel for Bitbucket</strong> in a project's <em>Settings → Hooks</em>: every repository of the
     project is checked. A repository can override the project's settings, or disable the hook. Blank fields use the
     defaults above. Or, from a provisioning pipeline:</p>
   <div class="snippet">
     <span class="snippet-label">Enable on a project, with settings</span>
-    <pre><code id="enable">curl -X PUT "$BB/rest/api/1.0/projects/PAY/settings/hooks/com.github.bluenoah.git-commit-sentinel-bitbucket:commit-sentinel-hook/enabled" \
+    <pre><code id="enable">curl -X PUT "$BB/rest/api/1.0/projects/PAY/settings/hooks/com.github.bluenoah.git-commit-sentinel-bitbucket:git-commit-sentinel-bitbucket-hook/enabled" \
      -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
      -d '{"types":"feat,fix,chore","rule-description-period":"error","bypassUsers":"ci-bot"}'</code></pre>
     <button class="copy-btn" data-target="enable" type="button">Copy</button>

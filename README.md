@@ -19,10 +19,10 @@ On every `git push`, for each feature branch created or updated (by default
 `feature/.+`, configurable), every commit **new to the repository** is checked:
 
 ```text
-remote: git-commit-sentinel: 1a2b3c4 on feature/login: "wip: stuff"
-remote: git-commit-sentinel:   error: [type] type "wip" is not in the allowed list: feat, fix, ...
-remote: git-commit-sentinel: 5d6e7f8 on feature/login: "fix: the bug."
-remote: git-commit-sentinel:   warning: [description-period] description must not end with a period
+remote: git-commit-sentinel-bitbucket: 1a2b3c4 on feature/login: "wip: stuff"
+remote: git-commit-sentinel-bitbucket:   error: [type] type "wip" is not in the allowed list: feat, fix, ...
+remote: git-commit-sentinel-bitbucket: 5d6e7f8 on feature/login: "fix: the bug."
+remote: git-commit-sentinel-bitbucket:   warning: [description-period] description must not end with a period
 ```
 
 - Any `error` finding rejects the push; `warning`s are shown and the push proceeds.
@@ -45,7 +45,7 @@ remote: git-commit-sentinel:   warning: [description-period] description must no
 
 ## Configuration
 
-The hook is **Git Commit Sentinel** in *Settings → Hooks*
+The hook is **Git Commit Sentinel for Bitbucket** in *Settings → Hooks*
 ([ADR 0004](docs/adr/0004-project-and-repository-configuration.md)):
 
 - **Project**: enable it once, every repository of the project (present and
@@ -77,7 +77,7 @@ curl -s -u admin "$BB/rest/access-tokens/latest/projects/PAY" | jq -r '.values[]
 ### REST (e.g. from a project-provisioning pipeline)
 
 ```sh
-HOOK=com.github.bluenoah.git-commit-sentinel-bitbucket:commit-sentinel-hook
+HOOK=com.github.bluenoah.git-commit-sentinel-bitbucket:git-commit-sentinel-bitbucket-hook
 
 # enable on a project, with settings (omit the body's fields to use the defaults)
 curl -X PUT "$BB/rest/api/1.0/projects/PAY/settings/hooks/$HOOK/enabled" \
