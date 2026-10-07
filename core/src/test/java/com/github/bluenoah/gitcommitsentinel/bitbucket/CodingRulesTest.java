@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test;
 class CodingRulesTest {
 
     private final JavaClasses productionClasses = new ClassFileImporter()
-            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
+            .withImportOption(location -> !location.contains("-tests.jar"))
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
             .importPackages("com.github.bluenoah.gitcommitsentinel.bitbucket");
 
     private final JavaClasses testClasses = new ClassFileImporter()
-            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
+            .withImportOption(location -> !location.contains("-tests.jar"))
             .withImportOption(ImportOption.Predefined.ONLY_INCLUDE_TESTS)
             .importPackages("com.github.bluenoah.gitcommitsentinel.bitbucket");
 
