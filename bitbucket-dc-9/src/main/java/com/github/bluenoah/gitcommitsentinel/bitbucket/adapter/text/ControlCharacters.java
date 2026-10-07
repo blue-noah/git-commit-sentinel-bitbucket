@@ -4,6 +4,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Makes untrusted text (commit messages, branch names, usernames, settings typed by an admin) safe to show on a
+ * terminal, in a log or in a form. Text is kept as written, except for characters a terminal executes (ANSI escape
+ * sequences, carriage returns) or that change how text reads (bidirectional overrides, invisible characters, line
+ * separators): each becomes a visible <code>&#92;u{hex}</code>, so the text can neither attack nor deceive its reader.
+ */
 public final class ControlCharacters {
 
     private static final Set<Integer> UNICODE_CATEGORIES_TO_NEUTRALIZE =
