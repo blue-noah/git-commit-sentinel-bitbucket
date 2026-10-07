@@ -36,15 +36,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.BDDMockito;
 
-class SentinelHookTest {
+class ConventionalCommitsHookTest {
 
     private final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
     private final PreRepositoryHookContext context = mock(PreRepositoryHookContext.class);
     private final SettingsValidationErrors formErrors = mock(SettingsValidationErrors.class);
     private final StringWriter terminalOutput = new StringWriter();
 
-    private final SentinelHook sut =
-            new SentinelHook(new CheckPush(RuleSet.standard()), RuleSet.standard(), authenticationContext);
+    private final ConventionalCommitsHook sut =
+            new ConventionalCommitsHook(new CheckPush(RuleSet.standard()), RuleSet.standard(), authenticationContext);
 
     @BeforeEach
     void aliceIsPushingWithDefaultSettings() {

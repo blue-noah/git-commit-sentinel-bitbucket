@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 class SoyFormTest {
@@ -34,7 +35,8 @@ class SoyFormTest {
                         .contains("{param rule: '%s' /}".formatted(rule.name())));
         then(soy).contains("value=\"%s\"".formatted(SettingsKeys.DEFAULT_LEVEL_CHOICE));
         Arrays.stream(Level.values())
-                .forEach(level -> then(soy).contains("value=\"%s\"".formatted(level.settingValue())));
+                .forEach(level ->
+                        then(soy).contains("value=\"%s\"".formatted(level.name().toLowerCase(Locale.ROOT))));
     }
 
     private String hookFormTemplate() throws IOException {

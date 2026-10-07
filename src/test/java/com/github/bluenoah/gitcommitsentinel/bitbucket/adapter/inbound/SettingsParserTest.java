@@ -2,7 +2,7 @@ package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
-import com.github.bluenoah.gitcommitsentinel.bitbucket.application.SentinelConfig;
+import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushPolicy;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.Level;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleConfig;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleSet;
@@ -14,21 +14,21 @@ class SettingsParserTest {
 
     private final Map<String, String> reportedProblems = new HashMap<>();
 
-    private SentinelConfig parse(Map<String, ?> hookSettings) {
-        return new SettingsParser(RuleSet.standard(), hookSettings, reportedProblems::put).sentinelConfig();
+    private PushPolicy parse(Map<String, ?> hookSettings) {
+        return new SettingsParser(RuleSet.standard(), hookSettings, reportedProblems::put).pushPolicy();
     }
 
     @Test
     void emptySettingsGiveTheBuiltInDefaults() {
         // when
-        var config = parse(Map.of());
+        var policy = parse(Map.of());
 
         // then
-        then(config.ruleConfig().allowedTypes()).isEqualTo(RuleConfig.DEFAULT_ALLOWED_TYPES);
-        then(config.ruleConfig().headerMaxLength()).isEqualTo(RuleConfig.DEFAULT_HEADER_MAX_LENGTH);
-        then(config.ruleConfig().configuredLevels()).isEmpty();
-        then(config.bypassUsernames()).isEmpty();
-        then(config.featureBranchPattern()).isEqualTo(SentinelConfig.DEFAULT_FEATURE_BRANCH_PATTERN);
+        then(policy.ruleConfig().allowedTypes()).isEqualTo(RuleConfig.DEFAULT_ALLOWED_TYPES);
+        then(policy.ruleConfig().headerMaxLength()).isEqualTo(RuleConfig.DEFAULT_HEADER_MAX_LENGTH);
+        then(policy.ruleConfig().configuredLevels()).isEmpty();
+        then(policy.bypassUsernames()).isEmpty();
+        then(policy.featureBranchPattern()).isEqualTo(PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN);
         then(reportedProblems).isEmpty();
     }
 
@@ -48,13 +48,13 @@ class SettingsParserTest {
                 "default");
 
         // when
-        var config = parse(hookSettings);
+        var policy = parse(hookSettings);
 
         // then
-        then(config.featureBranchPattern().pattern()).isEqualTo("(feature|story)/.+");
-        then(config.ruleConfig().allowedTypes()).containsExactly("feat", "task");
-        then(config.ruleConfig().headerMaxLength()).isEqualTo(RuleConfig.DEFAULT_HEADER_MAX_LENGTH);
-        then(config.ruleConfig().configuredLevels()).containsExactly(Map.entry("type", Level.WARN));
+        then(policy.featureBranchPattern().pattern()).isEqualTo("(feature|story)/.+");
+        then(policy.ruleConfig().allowedTypes()).containsExactly("feat", "task");
+        then(policy.ruleConfig().headerMaxLength()).isEqualTo(RuleConfig.DEFAULT_HEADER_MAX_LENGTH);
+        then(policy.ruleConfig().configuredLevels()).containsExactly(Map.entry("type", Level.WARN));
         then(reportedProblems).isEmpty();
     }
 
@@ -64,10 +64,10 @@ class SettingsParserTest {
         var hookSettings = Map.of(SettingsKeys.BYPASS_USERS, "CI-Bot,\n alice ");
 
         // when
-        var config = parse(hookSettings);
+        var policy = parse(hookSettings);
 
         // then
-        then(config.bypassUsernames()).containsExactlyInAnyOrder("CI-Bot", "alice");
+        then(policy.bypassUsernames()).containsExactlyInAnyOrder("CI-Bot", "alice");
     }
 
     @Test
@@ -84,7 +84,7 @@ class SettingsParserTest {
                 "fatal");
 
         // when
-        var config = parse(hookSettings);
+        var policy = parse(hookSettings);
 
         // then
         then(reportedProblems)
@@ -93,10 +93,10 @@ class SettingsParserTest {
                         SettingsKeys.HEADER_MAX_LENGTH,
                         SettingsKeys.TYPES,
                         SettingsKeys.RULE_LEVEL.formatted("type"));
-        then(config.featureBranchPattern()).isEqualTo(SentinelConfig.DEFAULT_FEATURE_BRANCH_PATTERN);
-        then(config.ruleConfig().headerMaxLength()).isEqualTo(RuleConfig.DEFAULT_HEADER_MAX_LENGTH);
-        then(config.ruleConfig().allowedTypes()).isEqualTo(RuleConfig.DEFAULT_ALLOWED_TYPES);
-        then(config.ruleConfig().configuredLevels()).isEmpty();
+        then(policy.featureBranchPattern()).isEqualTo(PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN);
+        then(policy.ruleConfig().headerMaxLength()).isEqualTo(RuleConfig.DEFAULT_HEADER_MAX_LENGTH);
+        then(policy.ruleConfig().allowedTypes()).isEqualTo(RuleConfig.DEFAULT_ALLOWED_TYPES);
+        then(policy.ruleConfig().configuredLevels()).isEmpty();
     }
 
     @Test
@@ -110,14 +110,14 @@ class SettingsParserTest {
         json.put(SettingsKeys.BRANCH_PATTERN, null);
 
         // when
-        var config = parse(json);
+        var policy = parse(json);
 
         // then
-        then(config.ruleConfig().headerMaxLength()).isEqualTo(72);
-        then(config.ruleConfig().allowedTypes()).containsExactly("feat", "fix");
-        then(config.bypassUsernames()).containsExactlyInAnyOrder("CI-Bot", "release");
-        then(config.ruleConfig().configuredLevels()).containsExactly(Map.entry("type", Level.WARN));
-        then(config.featureBranchPattern()).isEqualTo(SentinelConfig.DEFAULT_FEATURE_BRANCH_PATTERN);
+        then(policy.ruleConfig().headerMaxLength()).isEqualTo(72);
+        then(policy.ruleConfig().allowedTypes()).containsExactly("feat", "fix");
+        then(policy.bypassUsernames()).containsExactlyInAnyOrder("CI-Bot", "release");
+        then(policy.ruleConfig().configuredLevels()).containsExactly(Map.entry("type", Level.WARN));
+        then(policy.featureBranchPattern()).isEqualTo(PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN);
         then(reportedProblems).isEmpty();
     }
 

@@ -2,12 +2,13 @@ package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound;
 
 import static java.util.function.Predicate.not;
 
-import com.github.bluenoah.gitcommitsentinel.bitbucket.application.SentinelConfig;
+import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushPolicy;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.Level;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleConfig;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleSet;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,13 +21,8 @@ import java.util.stream.Stream;
 
 record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<String, String> reportInvalidSetting) {
 
-    private static final String ACCEPTED_LEVEL_CHOICES = Stream.concat(
-                    Stream.of(SettingsKeys.DEFAULT_LEVEL_CHOICE),
-                    Arrays.stream(Level.values()).map(Level::settingValue))
-            .collect(Collectors.joining(", "));
-
-    SentinelConfig sentinelConfig() {
-        return new SentinelConfig(
+    PushPolicy pushPolicy() {
+        return new PushPolicy(
                 featureBranchPattern(),
                 new RuleConfig(allowedTypes(), headerMaxLength(), configuredLevels()),
                 Set.copyOf(listSetting(SettingsKeys.BYPASS_USERS)));
@@ -35,7 +31,7 @@ record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<S
     private Pattern featureBranchPattern() {
         return nonBlankSetting(SettingsKeys.BRANCH_PATTERN)
                 .flatMap(this::compiledOrReported)
-                .orElse(SentinelConfig.DEFAULT_FEATURE_BRANCH_PATTERN);
+                .orElse(PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN);
     }
 
     private List<String> allowedTypes() {
@@ -69,9 +65,7 @@ record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<S
         return nonBlankSetting(key)
                 .filter(not(this::isDefaultLevelChoice))
                 .flatMap(raw -> reportedIfEmpty(
-                        Level.fromSettingValue(raw),
-                        key,
-                        "Must be one of %s, got \"%s\".".formatted(ACCEPTED_LEVEL_CHOICES, raw)));
+                        level(raw), key, "Must be one of %s, got \"%s\".".formatted(acceptedLevelChoices(), raw)));
     }
 
     private Optional<String> nonBlankSetting(String key) {
@@ -106,6 +100,23 @@ record SettingsParser(RuleSet ruleSet, Map<String, ?> hookSettings, BiConsumer<S
                 .map(String::strip)
                 .filter(not(String::isEmpty))
                 .toList();
+    }
+
+    private Optional<Level> level(String raw) {
+        return Arrays.stream(Level.values())
+                .filter(level -> levelChoice(level).equalsIgnoreCase(raw.strip()))
+                .findFirst();
+    }
+
+    private String acceptedLevelChoices() {
+        return Stream.concat(
+                        Stream.of(SettingsKeys.DEFAULT_LEVEL_CHOICE),
+                        Arrays.stream(Level.values()).map(this::levelChoice))
+                .collect(Collectors.joining(", "));
+    }
+
+    private String levelChoice(Level level) {
+        return level.name().toLowerCase(Locale.ROOT);
     }
 
     private boolean isDefaultLevelChoice(String raw) {

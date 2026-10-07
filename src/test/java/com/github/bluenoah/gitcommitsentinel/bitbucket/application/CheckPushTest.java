@@ -19,8 +19,8 @@ class CheckPushTest {
 
     private static final RuleConfig DEFAULTS =
             new RuleConfig(RuleConfig.DEFAULT_ALLOWED_TYPES, RuleConfig.DEFAULT_HEADER_MAX_LENGTH, Map.of());
-    private static final SentinelConfig CONFIG =
-            new SentinelConfig(SentinelConfig.DEFAULT_FEATURE_BRANCH_PATTERN, DEFAULTS, Set.of("CI-Bot"));
+    private static final PushPolicy POLICY =
+            new PushPolicy(PushPolicy.DEFAULT_FEATURE_BRANCH_PATTERN, DEFAULTS, Set.of("CI-Bot"));
     private static final Optional<String> ALICE = Optional.of("alice");
 
     private final PushReport report = mock(PushReport.class);
@@ -45,7 +45,7 @@ class CheckPushTest {
     @Test
     void aPushToAFeatureBranchStartsACheckOfItsNewCommits() {
         // when
-        var pushedCommitsCheck = sut.start(List.of(branch("main"), branch("feature/x")), ALICE, CONFIG, report);
+        var pushedCommitsCheck = sut.start(List.of(branch("main"), branch("feature/x")), ALICE, POLICY, report);
 
         // then
         then(pushedCommitsCheck).isPresent();
@@ -54,7 +54,7 @@ class CheckPushTest {
     @Test
     void theCheckItStartsLooksOnlyAtTheFeatureBranchesOfThePush() {
         // given
-        var pushedCommitsCheck = sut.start(List.of(branch("main"), branch("feature/x")), ALICE, CONFIG, report)
+        var pushedCommitsCheck = sut.start(List.of(branch("main"), branch("feature/x")), ALICE, POLICY, report)
                 .orElseThrow();
 
         // when
@@ -69,7 +69,7 @@ class CheckPushTest {
     @Test
     void aPushWithoutFeatureBranchesHasNothingToCheck() {
         // when
-        var pushedCommitsCheck = sut.start(List.of(branch("main")), ALICE, CONFIG, report);
+        var pushedCommitsCheck = sut.start(List.of(branch("main")), ALICE, POLICY, report);
 
         // then
         then(pushedCommitsCheck).isEmpty();
@@ -78,7 +78,7 @@ class CheckPushTest {
     @Test
     void deletingAFeatureBranchHasNothingToCheck() {
         // when
-        var pushedCommitsCheck = sut.start(List.of(deletedBranch("feature/x")), ALICE, CONFIG, report);
+        var pushedCommitsCheck = sut.start(List.of(deletedBranch("feature/x")), ALICE, POLICY, report);
 
         // then
         then(pushedCommitsCheck).isEmpty();
@@ -87,7 +87,7 @@ class CheckPushTest {
     @Test
     void tagsAreNeverCheckedEvenIfNamedLikeAFeatureBranch() {
         // when
-        var pushedCommitsCheck = sut.start(List.of(tag("feature/v1")), ALICE, CONFIG, report);
+        var pushedCommitsCheck = sut.start(List.of(tag("feature/v1")), ALICE, POLICY, report);
 
         // then
         then(pushedCommitsCheck).isEmpty();
@@ -96,7 +96,7 @@ class CheckPushTest {
     @Test
     void theConfiguredBranchPatternDecidesWhatAFeatureBranchIs() {
         // given
-        var storiesToo = new SentinelConfig(Pattern.compile("(feature|story)/.+"), DEFAULTS, Set.of());
+        var storiesToo = new PushPolicy(Pattern.compile("(feature|story)/.+"), DEFAULTS, Set.of());
 
         // when
         var pushedCommitsCheck = sut.start(List.of(branch("story/ABC-1")), ALICE, storiesToo, report);
@@ -108,7 +108,7 @@ class CheckPushTest {
     @Test
     void anExemptPusherIsNotCheckedAndIsToldSo() {
         // when
-        var pushedCommitsCheck = sut.start(List.of(branch("feature/x")), Optional.of("ci-bot"), CONFIG, report);
+        var pushedCommitsCheck = sut.start(List.of(branch("feature/x")), Optional.of("ci-bot"), POLICY, report);
 
         // then
         then(pushedCommitsCheck).isEmpty();
@@ -118,7 +118,7 @@ class CheckPushTest {
     @Test
     void aPusherNotListedIsChecked() {
         // when
-        var pushedCommitsCheck = sut.start(List.of(branch("feature/x")), ALICE, CONFIG, report);
+        var pushedCommitsCheck = sut.start(List.of(branch("feature/x")), ALICE, POLICY, report);
 
         // then
         then(pushedCommitsCheck).isPresent();
@@ -128,7 +128,7 @@ class CheckPushTest {
     @Test
     void anAnonymousPushIsNeverExempt() {
         // when
-        var pushedCommitsCheck = sut.start(List.of(branch("feature/x")), Optional.empty(), CONFIG, report);
+        var pushedCommitsCheck = sut.start(List.of(branch("feature/x")), Optional.empty(), POLICY, report);
 
         // then
         then(pushedCommitsCheck).isPresent();

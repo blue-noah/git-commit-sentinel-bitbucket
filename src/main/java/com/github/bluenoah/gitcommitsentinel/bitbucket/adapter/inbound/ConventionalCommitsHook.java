@@ -19,8 +19,8 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound.ControlCharacters;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound.PusherTerminal;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.CheckPush;
+import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushPolicy;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushedRef;
-import com.github.bluenoah.gitcommitsentinel.bitbucket.application.SentinelConfig;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleSet;
 import java.util.List;
 import java.util.Optional;
@@ -29,9 +29,9 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SentinelHook implements PreRepositoryHook<RepositoryPushHookRequest>, SettingsValidator {
+public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPushHookRequest>, SettingsValidator {
 
-    private static final Logger log = LoggerFactory.getLogger(SentinelHook.class);
+    private static final Logger log = LoggerFactory.getLogger(ConventionalCommitsHook.class);
 
     private final CheckPush checkPush;
     private final RuleSet ruleSet;
@@ -39,7 +39,7 @@ public class SentinelHook implements PreRepositoryHook<RepositoryPushHookRequest
     private final ControlCharacters controlCharacters = new ControlCharacters();
 
     @Inject
-    public SentinelHook(
+    public ConventionalCommitsHook(
             CheckPush checkPush, RuleSet ruleSet, @ComponentImport AuthenticationContext authenticationContext) {
         this.checkPush = checkPush;
         this.ruleSet = ruleSet;
@@ -52,7 +52,7 @@ public class SentinelHook implements PreRepositoryHook<RepositoryPushHookRequest
         try {
             if (isGitPush(push)) {
                 checkPush
-                        .start(pushedRefs(push), pusherName(), config(context, push), pusherTerminal)
+                        .start(pushedRefs(push), pusherName(), pushPolicy(context, push), pusherTerminal)
                         .ifPresent(pushedCommitsCheck -> context.registerCommitCallback(
                                 new PushedCommitsListener(pushedCommitsCheck, pusherTerminal),
                                 RepositoryHookCommitFilter.ADDED_TO_REPOSITORY));
@@ -66,7 +66,7 @@ public class SentinelHook implements PreRepositoryHook<RepositoryPushHookRequest
 
     @Override
     public void validate(Settings settings, SettingsValidationErrors errors, Scope scope) {
-        new SettingsParser(ruleSet, settings.asMap(), neutralizingProblems(errors::addFieldError)).sentinelConfig();
+        new SettingsParser(ruleSet, settings.asMap(), neutralizingProblems(errors::addFieldError)).pushPolicy();
     }
 
     private boolean isGitPush(RepositoryPushHookRequest push) {
@@ -90,7 +90,7 @@ public class SentinelHook implements PreRepositoryHook<RepositoryPushHookRequest
         return Optional.ofNullable(authenticationContext.getCurrentUser()).map(ApplicationUser::getName);
     }
 
-    private SentinelConfig config(PreRepositoryHookContext context, RepositoryPushHookRequest push) {
+    private PushPolicy pushPolicy(PreRepositoryHookContext context, RepositoryPushHookRequest push) {
         return new SettingsParser(
                         ruleSet,
                         context.getSettings().asMap(),
@@ -99,7 +99,7 @@ public class SentinelHook implements PreRepositoryHook<RepositoryPushHookRequest
                                 key,
                                 push.getRepository(),
                                 problem)))
-                .sentinelConfig();
+                .pushPolicy();
     }
 
     private BiConsumer<String, String> neutralizingProblems(BiConsumer<String, String> problemSink) {
