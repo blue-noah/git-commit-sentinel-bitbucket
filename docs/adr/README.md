@@ -13,3 +13,4 @@ acceptance — a changed decision gets a new ADR that supersedes the old one.
 | [0004](0004-project-and-repository-configuration.md) | Configuration per project and repository, through Bitbucket's hook settings |
 | [0005](0005-fail-open.md) | Fail open on internal errors |
 | [0006](0006-scope-push-only-skip-merges.md) | Only `git push`; merge commits are never checked |
+| [0007](0007-hexagonal-architecture.md) | Hexagonal architecture |
