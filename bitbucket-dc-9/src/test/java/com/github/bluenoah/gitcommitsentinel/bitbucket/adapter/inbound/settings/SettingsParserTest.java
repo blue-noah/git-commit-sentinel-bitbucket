@@ -15,7 +15,7 @@ class SettingsParserTest {
     private final Map<String, String> reportedProblems = new HashMap<>();
 
     private PushPolicy parse(Map<String, ?> hookSettings) {
-        return new SettingsParser(RuleSet.standard(), hookSettings, reportedProblems::put).pushPolicy();
+        return new SettingsParser(RuleSet.standard()).pushPolicy(hookSettings, reportedProblems::put);
     }
 
     @Test
