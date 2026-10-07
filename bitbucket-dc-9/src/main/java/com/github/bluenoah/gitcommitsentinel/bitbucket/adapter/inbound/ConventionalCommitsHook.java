@@ -16,6 +16,7 @@ import com.atlassian.bitbucket.setting.SettingsValidationErrors;
 import com.atlassian.bitbucket.setting.SettingsValidator;
 import com.atlassian.bitbucket.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.settings.SettingsParser;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound.ControlCharacters;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound.PusherTerminal;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.CheckPush;

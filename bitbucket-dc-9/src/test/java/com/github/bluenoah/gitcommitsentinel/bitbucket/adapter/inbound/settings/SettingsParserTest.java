@@ -1,4 +1,4 @@
-package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound;
+package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.inbound.settings;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
