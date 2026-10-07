@@ -37,6 +37,7 @@
         <bytebuddy.version>1.18.14</bytebuddy.version>
         <assertj.version>3.27.7</assertj.version>
         <archunit.version>1.5.1</archunit.version>
+        <inject.resources.version>1.0.0</inject.resources.version>
         <jacoco.version>0.8.15</jacoco.version>
         <pitest.version>1.30.0</pitest.version>
         <pitest.junit5.version>1.2.3</pitest.junit5.version>
@@ -82,6 +83,11 @@
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit</artifactId>
                 <version>${archunit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.hosuaby</groupId>
+                <artifactId>inject-resources-junit-jupiter</artifactId>
+                <version>${inject.resources.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
