@@ -2,6 +2,7 @@ package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound;
 
 import com.atlassian.bitbucket.hook.ScmHookDetails;
 import com.atlassian.bitbucket.hook.repository.RepositoryPushHookRequest;
+import com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.text.ControlCharacters;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushReport;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.application.PushedCommit;
 import com.github.bluenoah.gitcommitsentinel.bitbucket.domain.RuleViolation;

@@ -27,6 +27,15 @@ class ArchitectureTest {
         then(outboundImports).isNotEmpty().noneMatch(imported -> imported.startsWith(inboundPackage));
     }
 
+    @Test
+    void untrustedTextHandlingDependsOnTheJdkOnly() {
+        // when
+        var textImports = importsOf(MAIN_SOURCES.resolve("adapter/text"));
+
+        // then
+        then(textImports).isNotEmpty().allMatch(imported -> imported.startsWith("java."));
+    }
+
     private List<String> importsOf(Path layerSources) {
         try (Stream<Path> files = Files.list(layerSources)) {
             return files.flatMap(this::lines)

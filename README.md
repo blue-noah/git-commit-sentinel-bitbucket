@@ -173,6 +173,7 @@ split into Maven modules ([ADR 0008](docs/adr/0008-core-and-bitbucket-plugin-mod
 - `bitbucket-dc-9/`
   - `adapter.inbound` — where Bitbucket calls in: the repository hook, the stream of pushed commits, the hook settings.
   - `adapter.outbound` — where the application calls out: the pusher's terminal, implementing `PushReport`.
+  - `adapter.text` — untrusted text on its way out (terminal, log, form), its control characters made visible.
 
 No third-party libraries bundled: the plugin jar embeds only `core`, and uses the APIs Bitbucket provides.
 
