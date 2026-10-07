@@ -1,4 +1,4 @@
-package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.outbound;
+package com.github.bluenoah.gitcommitsentinel.bitbucket.adapter.text;
 
 import java.util.Set;
 import java.util.stream.Collectors;
