@@ -1,57 +1,67 @@
 package com.github.bluenoah.gitcommitsentinel.bitbucket;
 
-import static org.assertj.core.api.BDDAssertions.then;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Stream;
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.Test;
 
 class ArchitectureTest {
 
-    private static final Path MAIN_SOURCES = Path.of("src/main/java/com/github/bluenoah/gitcommitsentinel/bitbucket");
-    private static final String PROJECT_PACKAGE = "com.github.bluenoah.gitcommitsentinel.bitbucket";
+    private final JavaClasses productionClasses = new ClassFileImporter()
+            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+            .importPackages("com.github.bluenoah.gitcommitsentinel.bitbucket");
 
     @Test
-    void outboundAdaptersNeverImportInboundOnes() {
+    void dependenciesPointInwardsOnly() {
         // given
-        var inboundPackage = "%s.adapter.inbound.".formatted(PROJECT_PACKAGE);
+        var rule = layeredArchitecture()
+                .consideringOnlyDependenciesInLayers()
+                .layer("Domain")
+                .definedBy("..domain..")
+                .layer("Application")
+                .definedBy("..application..")
+                .layer("Adapter")
+                .definedBy("..adapter..")
+                .whereLayer("Adapter")
+                .mayNotBeAccessedByAnyLayer()
+                .whereLayer("Application")
+                .mayOnlyBeAccessedByLayers("Adapter")
+                .whereLayer("Domain")
+                .mayOnlyBeAccessedByLayers("Application", "Adapter");
 
-        // when
-        var outboundImports = importsOf(MAIN_SOURCES.resolve("adapter/outbound"));
+        // when / then
+        rule.check(productionClasses);
+    }
 
-        // then
-        then(outboundImports).isNotEmpty().noneMatch(imported -> imported.startsWith(inboundPackage));
+    @Test
+    void outboundAdaptersNeverDependOnInboundOnes() {
+        // given
+        var rule = noClasses()
+                .that()
+                .resideInAPackage("..adapter.outbound..")
+                .should()
+                .dependOnClassesThat()
+                .resideInAPackage("..adapter.inbound..");
+
+        // when / then
+        rule.check(productionClasses);
     }
 
     @Test
     void untrustedTextHandlingDependsOnTheJdkOnly() {
-        // when
-        var textImports = importsOf(MAIN_SOURCES.resolve("adapter/text"));
+        // given
+        var rule = classes()
+                .that()
+                .resideInAPackage("..adapter.text..")
+                .should()
+                .onlyDependOnClassesThat()
+                .resideInAnyPackage("java..", "..adapter.text..");
 
-        // then
-        then(textImports).isNotEmpty().allMatch(imported -> imported.startsWith("java."));
-    }
-
-    private List<String> importsOf(Path layerSources) {
-        try (Stream<Path> files = Files.list(layerSources)) {
-            return files.flatMap(this::lines)
-                    .filter(line -> line.startsWith("import "))
-                    .map(line -> line.replaceFirst("^import (static )?", ""))
-                    .toList();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    private Stream<String> lines(Path file) {
-        try {
-            return Files.readAllLines(file).stream();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        // when / then
+        rule.check(productionClasses);
     }
 }
