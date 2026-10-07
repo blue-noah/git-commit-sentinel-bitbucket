@@ -29,6 +29,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Bitbucket's entry point, called once per push, before any commit is read. From the refs the push changes, it asks
+ * {@link CheckPush} whether there is anything to check and, if so, registers a {@link PushedCommitsListener} for the
+ * push's new commits. It always accepts: rejecting is up to the listener. It also validates the hook settings form.
+ */
 public class ConventionalCommitsHook implements PreRepositoryHook<RepositoryPushHookRequest>, SettingsValidator {
 
     private static final Logger log = LoggerFactory.getLogger(ConventionalCommitsHook.class);
